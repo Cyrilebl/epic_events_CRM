@@ -9,6 +9,7 @@ from sqlalchemy import (
     CheckConstraint,
 )
 from sqlalchemy.orm import relationship, declarative_base
+import bcrypt
 
 Base = declarative_base()
 
@@ -18,8 +19,10 @@ class Role(Base):
 
     name = Column(String, primary_key=True)
 
-    __table_args__ = CheckConstraint(
-        "name IN ('manager', 'commercial', 'support')", name="role_name_check"
+    __table_args__ = (
+        CheckConstraint(
+            "name IN ('manager', 'commercial', 'support')", name="role_name_check"
+        ),
     )
 
     users = relationship("User", back_populates="role")
@@ -32,15 +35,27 @@ class User(Base):
     first_name = Column(String, index=True, nullable=False)
     last_name = Column(String, index=True, nullable=False)
     email = Column(String, index=True, unique=True, nullable=False)
-    password = Column(String, nullable=False)
+    password_hash = Column(String, nullable=False)
     phone_number = Column(String, index=True)
 
-    role_name = Column(Integer, ForeignKey("roles.name"), nullable=False)
+    role_name = Column(String, ForeignKey("roles.name"), nullable=False)
 
     role = relationship("Role", back_populates="users")
     clients = relationship("Client", back_populates="commercial")
     contracts = relationship("Contract", back_populates="commercial")
     events = relationship("Event", back_populates="support")
+
+    def set_password(self, password):
+        """Hash password"""
+        salt = bcrypt.gensalt()
+        hashed = bcrypt.hashpw(password=password.encode("utf-8"), salt=salt)
+        self.password_hash = hashed.decode("utf-8")
+
+    def check_password(self, password):
+        """Check if password match with hash password"""
+        return bcrypt.checkpw(
+            password.encode("utf-8"), self.password_hash.encode("utf-8")
+        )
 
 
 class Client(Base):
@@ -59,8 +74,8 @@ class Client(Base):
     assigned_commercial = Column(Integer, ForeignKey("users.id"))
 
     commercial = relationship("User", back_populates="clients")
-    contracts = relationship("Contract", back_populates="clients")
-    events = relationship("Event", back_populates="clients")
+    contracts = relationship("Contract", back_populates="client")
+    events = relationship("Event", back_populates="client")
 
 
 class Contract(Base):
