@@ -1,3 +1,6 @@
+import click
+
+
 class UserView:
     def login(self):
         email = input("Email: ")
@@ -9,7 +12,7 @@ class UserView:
         first_name = input("First name: ")
         last_name = input("Last name: ")
         email = input("Email: ")
-        password = input("Password: ")
+        password = click.prompt("Password: ", hide_input=True, confirmation_prompt=True)
         role_name = input("User role ('manager', 'commercial', 'support'): ")
 
         return first_name, last_name, email, password, role_name
