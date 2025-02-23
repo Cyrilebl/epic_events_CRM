@@ -9,7 +9,6 @@ class Menu:
         print("-" * 40)
         print(
             """
-
           ------ Login ------
     """
         )
