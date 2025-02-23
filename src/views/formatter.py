@@ -1,0 +1,115 @@
+import click
+from tabulate import tabulate
+
+
+class Formatter:
+    def format_users(self, users_data):
+        headers = ["Last name", "First name", "Email", "Role"]
+
+        sorted_users = sorted(users_data, key=lambda user: user.last_name)
+        rows = [
+            [
+                user.last_name,
+                user.first_name,
+                user.email,
+                user.role_name,
+            ]
+            for user in sorted_users
+        ]
+
+        click.echo(tabulate(rows, headers, tablefmt="grid"))
+
+    def format_clients(self, clients_data):
+        if not clients_data:
+            click.echo(click.style("No current clients.", fg="yellow"))
+            return
+
+        headers = [
+            "Last name",
+            "First name",
+            "Email",
+            "Phone number",
+            "Company",
+            "Information",
+            "Creation date",
+            "Last update date",
+            "Assigned commercial",
+        ]
+
+        sorted_clients = sorted(clients_data, key=lambda client: client.last_name)
+        rows = [
+            [
+                client.last_name,
+                client.first_name,
+                client.email,
+                client.phone_number,
+                client.company,
+                client.information,
+                client.creation_date,
+                client.last_update_date,
+                client.assigned_commercial,
+            ]
+            for client in sorted_clients
+        ]
+
+        click.echo(tabulate(rows, headers, tablefmt="grid"))
+
+    def format_contracts(self, contracts_data):
+        if not contracts_data:
+            click.echo(click.style("No contracts available.", fg="yellow"))
+            return
+
+        headers = [
+            "Client ID",
+            "Total price",
+            "Remaining balance",
+            "Creation date",
+            "Signature",
+            "Assigned commercial",
+        ]
+
+        rows = [
+            [
+                contract.client_id,
+                contract.total_price,
+                contract.remaining_balance,
+                contract.creation_date,
+                contract.signature,
+                contract.assigned_commercial,
+            ]
+            for contract in contracts_data
+        ]
+
+        click.echo(tabulate(rows, headers, tablefmt="grid"))
+
+    def format_events(self, events_data):
+        if not events_data:
+            click.echo(click.style("No events scheduled.", fg="yellow"))
+            return
+
+        headers = [
+            "Client ID",
+            "Contract ID",
+            "Start date",
+            "End date",
+            "Location",
+            "Attendees",
+            "Notes",
+            "Assigned support",
+        ]
+
+        rows = [
+            [
+                event.client_id,
+                event.contract_id,
+                event.start_date,
+                event.end_date,
+                event.location,
+                event.attendees,
+                event.notes,
+                event.assigned_support,
+            ]
+            for event in events_data
+        ]
+
+        click.echo(tabulate(rows, headers, tablefmt="grid"))
