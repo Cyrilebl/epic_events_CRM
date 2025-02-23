@@ -1,13 +1,13 @@
 from .token import Token
 from src.models import User, Role
-from src.views import Menu, UserView, SuccessMessage, ErrorMessage
+from src.views import Menu, UserPrompt, SuccessMessage, ErrorMessage
 
 
 class UserManager:
     def __init__(self):
         self.token = Token()
         self.menu = Menu()
-        self.user_view = UserView()
+        self.user_view = UserPrompt()
         self.success_message = SuccessMessage()
         self.error_message = ErrorMessage()
 
