@@ -1,8 +1,7 @@
 from .user_manager import UserManager
-from .create_role import create_role
 from .menu_manager import MenuManager
 from .token import Token
-from src.models.database import init_db
+from src.models import init_db
 
 
 class MainController:
@@ -13,12 +12,13 @@ class MainController:
         self.token = Token()
 
     def run(self):
-        create_role(self.session)
-
-        self.manager.create_user(self.session)
+        # Login
         token = self.manager.login(self.session)
         user_id, role = self.token.verify_token(token)
-        self.menu_manager.show_menu(role)
+
+        # Menu
+        user_input = self.menu_manager.show_menu(role)
+        self.menu_manager.show_data(self.session, user_input)
 
         # user = "test"
         # if user.has_permission("assign_support"):
