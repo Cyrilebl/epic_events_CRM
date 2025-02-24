@@ -11,8 +11,6 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship, declarative_base
 import bcrypt
 
-from src.controllers.permissions import ROLE_PERMISSIONS
-
 
 Base = declarative_base()
 
@@ -47,6 +45,9 @@ class User(Base):
     contracts = relationship("Contract", back_populates="commercial")
     events = relationship("Event", back_populates="support")
 
+    def __repr__(self):
+        return f"{self.first_name} {self.last_name} {self.email} {self.role_name}"
+
     def set_password(self, password):
         """Hash password"""
         salt = bcrypt.gensalt()
@@ -58,9 +59,6 @@ class User(Base):
         return bcrypt.checkpw(
             password.encode("utf-8"), self.password_hash.encode("utf-8")
         )
-
-    def has_permission(self, action):
-        return action in ROLE_PERMISSIONS.get(self.role_name, set())
 
 
 class Client(Base):
