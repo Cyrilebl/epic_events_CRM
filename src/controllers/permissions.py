@@ -15,9 +15,11 @@ class Permissions:
     }
     SUPPORT_PERMISSIONS = {"edit_events_as_support"}
 
+    ROLE_PERMISSIONS = {
+        "manager": MANAGER_PERMISSIONS,
+        "commercial": COMMERCIAL_PERMISSIONS,
+        "support": SUPPORT_PERMISSIONS,
+    }
 
-ROLE_PERMISSIONS = {
-    "manager": Permissions.MANAGER_PERMISSIONS,
-    "commercial": Permissions.COMMERCIAL_PERMISSIONS,
-    "support": Permissions.SUPPORT_PERMISSIONS,
-}
+    def has_permission(self, user_role, action):
+        return action in self.ROLE_PERMISSIONS.get(user_role, set())
