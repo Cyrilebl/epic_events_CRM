@@ -1,5 +1,5 @@
 from src.views import Menu, Formatter
-from src.models import Contract, Event, User
+from src.models import Client, Contract, Event
 
 
 class MenuManager:
@@ -19,12 +19,12 @@ class MenuManager:
     def show_data(self, session, user_input):
         match user_input:
             case 1:
-                clients_data = session.query(User).all()
+                clients_data = session.query(Client).all()
                 return self.formatter.format_clients(clients_data)
             case 2:
-                self.session.query(Contract).all()
-                return self.formatter.format_contract(clients_data)
+                contracts_data = session.query(Contract).all()
+                return self.formatter.format_contract(contracts_data)
 
             case 3:
-                self.session.query(Event).all()
-                return self.formatter.format_event(clients_data)
+                events_data = session.query(Event).all()
+                return self.formatter.format_event(events_data)
