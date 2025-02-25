@@ -3,7 +3,7 @@ import jwt
 import datetime
 from dotenv import load_dotenv
 
-from src.views.error_message import ErrorMessage
+from src.views import ErrorMessage
 
 
 load_dotenv()
