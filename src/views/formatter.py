@@ -3,12 +3,34 @@ from tabulate import tabulate
 
 
 class Formatter:
-    def format_users(self, users_data):
-        headers = ["Last name", "First name", "Email", "Role"]
+    def format_one_user(self, user):
+        headers = [
+            "1. Last name",
+            "2. First name",
+            "3. Email",
+            "4. Password",
+            "5. Role",
+        ]
 
-        sorted_users = sorted(users_data, key=lambda user: user.last_name)
         rows = [
             [
+                user.last_name,
+                user.first_name,
+                user.email,
+                "xxxxxxxx",
+                user.role_name,
+            ]
+        ]
+
+        click.echo(tabulate(rows, headers, tablefmt="grid"))
+
+    def format_users(self, users_data):
+        headers = ["ID", "Last name", "First name", "Email", "Role"]
+
+        sorted_users = sorted(users_data, key=lambda user: user.id)
+        rows = [
+            [
+                user.id,
                 user.last_name,
                 user.first_name,
                 user.email,
@@ -21,7 +43,7 @@ class Formatter:
 
     def format_clients(self, clients_data):
         if not clients_data:
-            click.echo(click.style("No current clients.", fg="yellow"))
+            click.echo(click.style("No current clients.", fg="yellow", bold=True))
             return
 
         headers = [
@@ -56,7 +78,7 @@ class Formatter:
 
     def format_contracts(self, contracts_data):
         if not contracts_data:
-            click.echo(click.style("No contracts available.", fg="yellow"))
+            click.echo(click.style("No contracts available.", fg="yellow", bold=True))
             return
 
         headers = [
@@ -84,7 +106,7 @@ class Formatter:
 
     def format_events(self, events_data):
         if not events_data:
-            click.echo(click.style("No events scheduled.", fg="yellow"))
+            click.echo(click.style("No events scheduled.", fg="yellow", bold=True))
             return
 
         headers = [
