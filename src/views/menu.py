@@ -1,3 +1,5 @@
+import click
+
 from .user_choice import user_choice
 
 
@@ -19,45 +21,49 @@ class Menu:
         print(title.center(40))
         print("-" * 40)
 
-    def common_menu(self):
+    def read_menu(self):
         print(
-            """
-[1] Clients
-[2] Contracts
-[3] Events"""
+            f"""
+{click.style("Read Data", fg="cyan")}
+[1] Read clients
+[2] Read contracts
+[3] Read events"""
         )
 
     def manager(self):
         self.menu_header()
-        self.common_menu()
+        self.read_menu()
         print(
-            """
-User Management:
+            f"""
+{click.style("User Management", fg="cyan")}
 [4] Create user
 [5] Update user
 [6] Delete user
 
-Contract Management:
+{click.style("Contract Management", fg="cyan")}
 [7] Create contract
 [8] Update contract
 [9] Assign support agent to contract
+
+{click.style("Event Management", fg="cyan")}
+[10] Update event
     """
         )
-        return user_choice(9)
+        return user_choice(10)
 
     def commercial(self):
         self.menu_header()
-        self.common_menu()
+        self.read_menu()
         print(
-            """
-Client Management:
+            f"""
+{click.style("Client Management", fg="cyan")}
 [4] Create client
 [5] Update client
 
-Contract Management:
+{click.style("Contract Management", fg="cyan")}
 [6] Update contract
 
-Event Management:
+{click.style("Event Management", fg="cyan")}
 [7] Create event
         """
         )
@@ -65,10 +71,10 @@ Event Management:
 
     def support(self):
         self.menu_header()
-        self.common_menu()
+        self.read_menu()
         print(
-            """
-Event Management:
+            f"""
+{click.style("Event Management", fg="cyan")}
 [4] Update event"""
         )
         return user_choice(4)
