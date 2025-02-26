@@ -1,4 +1,5 @@
 import re
+
 import click
 
 
@@ -18,6 +19,27 @@ class UserPrompt:
                 )
             )
 
+    def validate_password(self, password):
+        pattern = r"^(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$"
+        return re.match(pattern, password)
+
+    def prompt_password(self):
+        while True:
+            password = click.prompt(
+                click.style("Password", fg="blue", bold=True),
+                hide_input=True,
+                confirmation_prompt=True,
+            )
+            if self.validate_password(password):
+                return password
+            click.echo(
+                click.style(
+                    "Invalid password format. Must have at least one uppercase letter, one digit, and be at least 8 characters long.",
+                    fg="red",
+                    bold=True,
+                )
+            )
+
     def login(self):
         email = self.prompt_email()
         password = click.prompt(
@@ -29,11 +51,7 @@ class UserPrompt:
         first_name = click.prompt(click.style("First name", fg="blue", bold=True))
         last_name = click.prompt(click.style("Last name", fg="blue", bold=True))
         email = self.prompt_email()
-        password = click.prompt(
-            click.style("Password", fg="blue", bold=True),
-            hide_input=True,
-            confirmation_prompt=True,
-        )
+        password = self.prompt_password()
         role_name = click.prompt(
             click.style("User role", fg="blue", bold=True),
             type=click.Choice(
@@ -64,22 +82,16 @@ class UserPrompt:
                         click.style("New First Name", fg="blue", bold=True)
                     )
                 case 3:
-                    user.email = click.prompt(
-                        click.style("New Email", fg="blue", bold=True)
-                    )
+                    user.email = self.prompt_email()
                 case 4:
-                    user.password_hash = click.prompt(
-                        click.style(
-                            "Password",
-                            hide_input=True,
-                            confirmation_prompt=True,
-                            fg="blue",
-                            bold=True,
-                        )
-                    )
+                    new_password = self.prompt_password()
+                    user.set_password(new_password)
                 case 5:
                     user.role_name = click.prompt(
-                        click.style("New Role", fg="blue", bold=True)
+                        click.style("New role", fg="blue", bold=True),
+                        type=click.Choice(
+                            ["manager", "commercial", "support"], case_sensitive=False
+                        ),
                     )
                 case _:
                     click.echo(
