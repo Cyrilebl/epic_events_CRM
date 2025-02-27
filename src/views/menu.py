@@ -46,13 +46,12 @@ class Menu:
 {click.style("Contract Management", fg="cyan")}
 [7] Create contract
 [8] Update contract
-[9] Assign support agent to contract
 
 {click.style("Event Management", fg="cyan")}
-[10] Update event
+[9] Assign support agent to event
     """
         )
-        return self.prompt.user_choice(10)
+        return self.prompt.user_choice(9)
 
     def commercial(self):
         self.menu_header()
