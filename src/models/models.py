@@ -1,16 +1,18 @@
-from sqlalchemy import (
-    Column,
-    String,
-    Integer,
-    Float,
-    Date,
-    Boolean,
-    ForeignKey,
-    CheckConstraint,
-)
-from sqlalchemy.orm import relationship, declarative_base
-import bcrypt
+import re
 
+import bcrypt
+from sqlalchemy import (
+    Boolean,
+    CheckConstraint,
+    Column,
+    Date,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    func,
+)
+from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
 
@@ -48,6 +50,16 @@ class User(Base):
     def __repr__(self):
         return f"{self.first_name} {self.last_name} {self.email} {self.role_name}"
 
+    @staticmethod
+    def validate_email(email):
+        pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
+        return re.match(pattern, email)
+
+    @staticmethod
+    def validate_password(password):
+        pattern = r"^(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$"
+        return re.match(pattern, password)
+
     def set_password(self, password):
         """Hash password"""
         salt = bcrypt.gensalt()
@@ -65,20 +77,27 @@ class Client(Base):
     __tablename__ = "clients"
 
     id = Column(Integer, primary_key=True)
-    first_name = Column(String, index=True)
-    last_name = Column(String, index=True)
-    email = Column(String, index=True, unique=True)
-    phone_number = Column(String, index=True)
+    first_name = Column(String, index=True, nullable=False)
+    last_name = Column(String, index=True, nullable=False)
+    email = Column(String, index=True, unique=True, nullable=False)
+    phone_number = Column(String, index=True, nullable=False)
     company_name = Column(String, index=True)
-    information = Column(String)
-    creation_date = Column(Date, index=True)
+    information = Column(String, nullable=False)
+    creation_date = Column(
+        Date, default=func.current_date(), index=True, nullable=False
+    )
     last_update_date = Column(Date)
 
-    assigned_commercial = Column(Integer, ForeignKey("users.id"))
+    assigned_commercial = Column(Integer, ForeignKey("users.id"), nullable=False)
 
     commercial = relationship("User", back_populates="clients")
     contracts = relationship("Contract", back_populates="client")
     events = relationship("Event", back_populates="client")
+
+    @staticmethod
+    def validate_phone_number(phone_number):
+        pattern = r"^\+\d{2,3} \d{3} \d{3} \d{3}$"
+        return re.match(pattern, phone_number)
 
 
 class Contract(Base):
