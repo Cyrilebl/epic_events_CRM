@@ -1,20 +1,18 @@
-from src.models import Role, User
-from src.views import ErrorMessage, Formatter, Menu, SuccessMessage, Prompt
+from src.models import Role, User, DataManager
+from src.views import Prompt, ErrorMessage, SuccessMessage
 
 from .token import Token
 
 
-class UserManager:
+class UserController:
     def __init__(self):
         self.token = Token()
-        self.menu = Menu()
+        self.data_manager = DataManager()
         self.prompt = Prompt()
-        self.formatter = Formatter()
-        self.success_message = SuccessMessage()
         self.error_message = ErrorMessage()
+        self.success_message = SuccessMessage()
 
     def login(self, session):
-        self.menu.login()
         while True:
             email = self.prompt.input("email")
             password = self.prompt.password()
@@ -55,8 +53,7 @@ class UserManager:
         )
         user.set_password(password)
 
-        session.add(user)
-        session.commit()
+        self.data_manager.add(session, user)
 
         self.success_message.confirm_action(
             f"{user.last_name.title()} {user.first_name.title()} ({user.role_name})",
@@ -64,20 +61,23 @@ class UserManager:
         )
 
     def edit_user(self, session, user):
-        self.formatter.format_one_user(user)
         while True:
             user_choice = self.prompt.user_choice(5)
 
             match user_choice:
                 case 1:
-                    user.last_name = self.prompt.input("new last name")
+                    self.data_manager.edit_field(
+                        session, user, "last_name", self.prompt.input("new last name")
+                    )
                 case 2:
-                    user.first_name = self.prompt.input("new first name")
+                    self.data_manager.edit_field(
+                        session, user, "first_name", self.prompt.input("new first name")
+                    )
                 case 3:
                     while True:
                         email = self.prompt.input("email")
                         if User.validate_email(email):
-                            user.email = email
+                            self.data_manager.edit_field(session, user, "email", email)
                             break
                         self.error_message.invalid_email()
                 case 4:
@@ -85,13 +85,17 @@ class UserManager:
                         password = self.prompt.password(confirm=True)
                         if User.validate_password(password):
                             user.set_password(password)
+                            self.data_manager.edit_field(
+                                session, user, "password", password
+                            )
                             break
                         self.error_message.invalid_password()
                 case 5:
-                    user.role_name = self.prompt.role()
-                    continue
+                    self.data_manager.edit_field(
+                        session, user, "role_name", self.prompt.role()
+                    )
+                    break
             break
-        session.commit()
 
         self.success_message.confirm_action(
             f"{user.last_name.title()} {user.first_name.title()} ({user.role_name})",
@@ -99,9 +103,7 @@ class UserManager:
         )
 
     def delete_user(self, session, user):
-        session.delete(user)
-        session.commit()
-
+        self.data_manager.delete(session, user)
         self.success_message.confirm_action(
             f"{user.last_name.title()} {user.first_name.title()} ({user.role_name})",
             "deleted",
