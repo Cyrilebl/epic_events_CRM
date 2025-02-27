@@ -1,9 +1,12 @@
 import click
 
-from .user_choice import user_choice
+from .prompt import Prompt
 
 
 class Menu:
+    def __init__(self):
+        self.prompt = Prompt()
+
     def login(self):
         title = "EPIC EVENTS CRM"
         print("-" * 40)
@@ -49,7 +52,7 @@ class Menu:
 [10] Update event
     """
         )
-        return user_choice(10)
+        return self.prompt.user_choice(10)
 
     def commercial(self):
         self.menu_header()
@@ -67,7 +70,7 @@ class Menu:
 [7] Create event
         """
         )
-        return user_choice(7)
+        return self.prompt.user_choice(7)
 
     def support(self):
         self.menu_header()
@@ -77,4 +80,4 @@ class Menu:
 {click.style("Event Management", fg="cyan")}
 [4] Update event"""
         )
-        return user_choice(4)
+        return self.prompt.user_choice(4)
