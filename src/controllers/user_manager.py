@@ -1,13 +1,14 @@
+from src.models import Role, User
+from src.views import ErrorMessage, Formatter, Menu, SuccessMessage, Prompt
+
 from .token import Token
-from src.models import User, Role
-from src.views import Menu, UserPrompt, Formatter, SuccessMessage, ErrorMessage
 
 
 class UserManager:
     def __init__(self):
         self.token = Token()
         self.menu = Menu()
-        self.user_prompt = UserPrompt()
+        self.prompt = Prompt()
         self.formatter = Formatter()
         self.success_message = SuccessMessage()
         self.error_message = ErrorMessage()
@@ -15,7 +16,8 @@ class UserManager:
     def login(self, session):
         self.menu.login()
         while True:
-            email, password = self.user_prompt.login()
+            email = self.prompt.input("email")
+            password = self.prompt.password()
 
             user = session.query(User).filter_by(email=email).first()
 
@@ -27,9 +29,22 @@ class UserManager:
             return token
 
     def create_user(self, session):
-        first_name, last_name, email, password, role_name = (
-            self.user_prompt.create_user()
-        )
+        last_name = self.prompt.input("last name")
+        first_name = self.prompt.input("first name")
+
+        while True:
+            email = self.prompt.input("email")
+            if User.validate_email(email):
+                break
+            self.error_message.invalid_email()
+
+        while True:
+            password = self.prompt.password(confirm=True)
+            if User.validate_password(password):
+                break
+            self.error_message.invalid_password()
+
+        role_name = self.prompt.role()
         role = session.query(Role).filter_by(name=role_name).first()
 
         user = User(
@@ -50,7 +65,32 @@ class UserManager:
 
     def edit_user(self, session, user):
         self.formatter.format_one_user(user)
-        self.user_prompt.edit_user(user)
+        while True:
+            user_choice = self.prompt.user_choice(5)
+
+            match user_choice:
+                case 1:
+                    user.last_name = self.prompt.input("new last name")
+                case 2:
+                    user.first_name = self.prompt.input("new first name")
+                case 3:
+                    while True:
+                        email = self.prompt.input("email")
+                        if User.validate_email(email):
+                            user.email = email
+                            break
+                        self.error_message.invalid_email()
+                case 4:
+                    while True:
+                        password = self.prompt.password(confirm=True)
+                        if User.validate_password(password):
+                            user.set_password(password)
+                            break
+                        self.error_message.invalid_password()
+                case 5:
+                    user.role_name = self.prompt.role()
+                    continue
+            break
         session.commit()
 
         self.success_message.confirm_action(
