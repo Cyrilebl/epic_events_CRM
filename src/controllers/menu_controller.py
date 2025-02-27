@@ -1,15 +1,16 @@
-from .user_manager import UserManager
-from .client_manager import ClientManager
-from src.views import Menu, Formatter, ErrorMessage, UserInteraction
+from .user_controller import UserController
+from .client_controller import ClientController
+from src.views import Menu, Formatter, SuccessMessage, ErrorMessage, UserInteraction
 from src.models import User, Client, Contract, Event
 
 
-class MenuManager:
+class MenuController:
     def __init__(self):
         self.menu = Menu()
         self.formatter = Formatter()
-        self.user_manager = UserManager()
-        self.client_manager = ClientManager()
+        self.user_controller = UserController()
+        self.client_manager = ClientController()
+        self.success_message = SuccessMessage()
         self.error_message = ErrorMessage()
         self.user_interaction = UserInteraction()
 
@@ -38,7 +39,8 @@ class MenuManager:
         users_data = session.query(User).all()
         match user_input:
             case 4:
-                self.user_manager.create_user(session)
+                self.user_controller.create_user(session)
+
             case 5:
                 self.formatter.format_users(users_data)
                 while True:
@@ -49,7 +51,9 @@ class MenuManager:
                     if user:
                         break
                     self.error_message.invalid_id("user")
-                self.user_manager.edit_user(session, user)
+                self.formatter.format_one_user(user)
+                self.user_controller.edit_user(session, user)
+
             case 6:
                 self.formatter.format_users(users_data)
                 while True:
@@ -60,14 +64,34 @@ class MenuManager:
                     if user:
                         break
                     self.error_message.invalid_id("user")
-                self.user_manager.delete_user(session, user)
+                self.user_controller.delete_user(session)
+
+            case 7:
+                pass
+
+            case 8:
+                pass
 
     def user_is_commercial(self, session, user_id, user_input):
         match user_input:
             case 4:
                 self.client_manager.create_client(session, user_id)
+
             case 5:
-                pass
+                clients_assign_to_commercial = (
+                    session.query(Client).filter_by(assigned_commercial=user_id).all()
+                )
+                self.formatter.format_clients(clients_assign_to_commercial)
+                while True:
+                    client_id = self.user_interaction.prompt_user_selection(
+                        "client", "modify"
+                    )
+                    client = session.query(Client).filter_by(id=client_id).first()
+                    if client:
+                        break
+                    self.error_message.invalid_id("client")
+                self.formatter.format_one_client(client)
+                self.client_manager.edit_client(session, client)
 
     def user_is_support(self):
         pass
