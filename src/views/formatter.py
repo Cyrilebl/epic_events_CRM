@@ -41,12 +41,36 @@ class Formatter:
 
         click.echo(tabulate(rows, headers, tablefmt="grid"))
 
+    def format_one_client(self, client):
+        headers = [
+            "1. Last name",
+            "2. First name",
+            "3. Email",
+            "4. Phone number",
+            "5. Company",
+            "6. Information",
+        ]
+
+        rows = [
+            [
+                client.last_name,
+                client.first_name,
+                client.email,
+                client.phone_number,
+                client.company_name,
+                client.information,
+            ]
+        ]
+
+        click.echo(tabulate(rows, headers, tablefmt="grid"))
+
     def format_clients(self, clients_data):
         if not clients_data:
             click.echo(click.style("No current clients.", fg="yellow", bold=True))
             return
 
         headers = [
+            "ID",
             "Last name",
             "First name",
             "Email",
@@ -61,6 +85,7 @@ class Formatter:
         sorted_clients = sorted(clients_data, key=lambda client: client.last_name)
         rows = [
             [
+                client.id,
                 client.last_name,
                 client.first_name,
                 client.email,
