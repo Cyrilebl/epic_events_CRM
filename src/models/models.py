@@ -95,6 +95,11 @@ class Client(Base):
     events = relationship("Event", back_populates="client")
 
     @staticmethod
+    def validate_email(email):
+        pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
+        return re.match(pattern, email)
+
+    @staticmethod
     def validate_phone_number(phone_number):
         pattern = r"^\+\d{2,3} \d{3} \d{3} \d{3}$"
         return re.match(pattern, phone_number)
