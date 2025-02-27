@@ -1,4 +1,5 @@
 from .user_manager import UserManager
+from .client_manager import ClientManager
 from src.views import Menu, Formatter, ErrorMessage, UserInteraction
 from src.models import User, Client, Contract, Event
 
@@ -8,6 +9,7 @@ class MenuManager:
         self.menu = Menu()
         self.formatter = Formatter()
         self.user_manager = UserManager()
+        self.client_manager = ClientManager()
         self.error_message = ErrorMessage()
         self.user_interaction = UserInteraction()
 
@@ -59,3 +61,13 @@ class MenuManager:
                         break
                     self.error_message.invalid_id("user")
                 self.user_manager.delete_user(session, user)
+
+    def user_is_commercial(self, session, token, user_input):
+        match user_input:
+            case 4:
+                self.client_manager.create_client(session, token)
+            case 5:
+                pass
+
+    def user_is_support(self):
+        pass
