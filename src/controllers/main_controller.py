@@ -1,34 +1,37 @@
-from .user_manager import UserManager
-from .menu_manager import MenuManager
 from .token import Token
+from .user_controller import UserController
+from .menu_controller import MenuController
 from src.models import init_db
-from src.views import SuccessMessage, UserInteraction
+from src.views import Menu, UserInteraction
 
 
 class MainController:
     def __init__(self):
-        self.session = init_db()
-        self.manager = UserManager()
-        self.menu_manager = MenuManager()
         self.token = Token()
-        self.success_message = SuccessMessage()
+        self.user_controller = UserController()
+        self.menu_controller = MenuController()
+        self.session = init_db()
+        self.menu = Menu()
         self.user_interaction = UserInteraction()
 
     def run(self):
         # Login
-        token = self.manager.login(self.session)
+        self.menu.login()
+        token = self.user_controller.login(self.session)
         user_id, role = self.token.verify_token(token)
 
         # Menu
         while True:
-            user_input = self.menu_manager.show_menu(role)
-            self.menu_manager.show_data(self.session, user_input)
+            user_input = self.menu_controller.show_menu(role)
+            self.menu_controller.show_data(self.session, user_input)
             if role == "manager":
-                self.menu_manager.user_is_manager(self.session, user_input)
+                self.menu_controller.user_is_manager(self.session, user_input)
             elif role == "commercial":
-                self.menu_manager.user_is_commercial(self.session, user_id, user_input)
+                self.menu_controller.user_is_commercial(
+                    self.session, user_id, user_input
+                )
             elif role == "support":
-                self.menu_manager.user_is_support()
+                self.menu_controller.user_is_support()
             self.user_interaction.return_to_menu()
 
         # user = "test"
