@@ -65,11 +65,11 @@ class Formatter:
                 client.first_name,
                 client.email,
                 client.phone_number,
-                client.company,
+                client.company_name,
                 client.information,
                 client.creation_date,
                 client.last_update_date,
-                client.assigned_commercial,
+                f"{client.commercial.last_name} {client.commercial.first_name}",
             ]
             for client in sorted_clients
         ]
