@@ -26,9 +26,7 @@ class MainController:
             if role == "manager":
                 self.menu_manager.user_is_manager(self.session, user_input)
             elif role == "commercial":
-                self.menu_manager.user_is_commercial(
-                    self.session, self.token, user_input
-                )
+                self.menu_manager.user_is_commercial(self.session, user_id, user_input)
             elif role == "support":
                 self.menu_manager.user_is_support()
             self.user_interaction.return_to_menu()

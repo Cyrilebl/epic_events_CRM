@@ -62,10 +62,10 @@ class MenuManager:
                     self.error_message.invalid_id("user")
                 self.user_manager.delete_user(session, user)
 
-    def user_is_commercial(self, session, token, user_input):
+    def user_is_commercial(self, session, user_id, user_input):
         match user_input:
             case 4:
-                self.client_manager.create_client(session, token)
+                self.client_manager.create_client(session, user_id)
             case 5:
                 pass
 

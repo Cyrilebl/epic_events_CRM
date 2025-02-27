@@ -9,7 +9,7 @@ class ClientManager:
         self.success_message = SuccessMessage()
         self.error_message = ErrorMessage()
 
-    def create_client(self, session, token):
+    def create_client(self, session, user_id):
         last_name = self.prompt.input("last name")
         first_name = self.prompt.input("first name")
 
@@ -26,7 +26,7 @@ class ClientManager:
             self.error_message.invalid_phone_number()
         company_name = self.prompt.input("company name")
         information = self.prompt.input("information")
-        current_user = self.get_current_user(session, token)
+        current_user = session.query(User).filter_by(id=user_id).first()
 
         client = Client(
             first_name=first_name,
