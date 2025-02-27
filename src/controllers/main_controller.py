@@ -20,14 +20,19 @@ class MainController:
         user_id, role = self.token.verify_token(token)
 
         # Menu
-        # if not user:
-        #     return "Access denied. Please log in."
-        # else
         while True:
             user_input = self.menu_manager.show_menu(role)
             self.menu_manager.show_data(self.session, user_input)
-            self.menu_manager.user_is_manager(self.session, user_input)
+            if role == "manager":
+                self.menu_manager.user_is_manager(self.session, user_input)
+            elif role == "commercial":
+                self.menu_manager.user_is_commercial(
+                    self.session, self.token, user_input
+                )
+            elif role == "support":
+                self.menu_manager.user_is_support()
             self.user_interaction.return_to_menu()
+
         # user = "test"
         # if user.has_permission("assign_support"):
         #     events_without_assigned_support = (
