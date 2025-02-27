@@ -1,11 +1,11 @@
 from .menu import Menu
-from .user_prompt import UserPrompt
+from .prompt import Prompt
 from .formatter import Formatter
 from .messages import SuccessMessage, ErrorMessage, UserInteraction
 
 __all__ = [
     Menu,
-    UserPrompt,
+    Prompt,
     Formatter,
     SuccessMessage,
     ErrorMessage,
