@@ -24,6 +24,29 @@ class ErrorMessage:
             )
         )
 
+    def invalid_email(self):
+        click.echo(
+            click.style("Invalid email format. Please try again.", fg="red", bold=True)
+        )
+
+    def invalid_password(self):
+        click.echo(
+            click.style(
+                "Invalid password format. Must have at least one uppercase letter, one digit, and be at least 8 characters long.",
+                fg="red",
+                bold=True,
+            )
+        )
+
+    def invalid_phone_number(self):
+        click.echo(
+            click.style(
+                "Invalid phone number format. Use: +XX XXX XXX XXX or +XXX XXX XXX XXX.",
+                fg="red",
+                bold=True,
+            )
+        )
+
 
 class SuccessMessage:
     def confirm_action(self, name, action):
