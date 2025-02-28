@@ -1,13 +1,15 @@
-from src.models import Client, Contract, DataManager
-from src.views import Prompt, ErrorMessage, SuccessMessage
+from src.models import User, Client, Contract, DataManager
+from src.views import Prompt, Formatter, ErrorMessage, SuccessMessage, UserInteraction
 
 
 class ContractController:
     def __init__(self):
         self.data_manager = DataManager()
         self.prompt = Prompt()
+        self.formatter = Formatter()
         self.error_message = ErrorMessage()
         self.success_message = SuccessMessage()
+        self.user_interaction = UserInteraction()
 
     def get_valid_price(self, prompt_text):
         while True:
@@ -16,13 +18,29 @@ class ContractController:
                 price = float(price)
                 price = round(price, 2)
                 if Contract.validate_price(price):
-                    break
+                    return price
             except ValueError:
                 self.error_message.invalid_number()
+
+    def get_valid_record(self, session, model, entity_name):
+        records = session.query(model).all()
+        (
+            self.formatter.format_clients(records)
+            if model == Client
+            else self.formatter.format_users(records)
+        )
+        while True:
+            record_id = self.user_interaction.prompt_user_selection(entity_name, "add")
+            record = session.query(model).filter_by(id=record_id).first()
+            if record:
+                return record
+            self.error_message.invalid_id(entity_name)
 
     def create_contract(self, session):
         total_price = self.get_valid_price("total price")
         remaining_balance = self.get_valid_price("remaining balance")
+        client = self.get_valid_record(session, Client, "client")
+        user = self.get_valid_record(session, User, "user")
 
         while True:
             signature = self.prompt.input("signature (yes/no)").lower()
@@ -33,16 +51,12 @@ class ContractController:
                 signature = False
                 break
 
-        # afficher tous les clients et choisir celui que l'on souhaite
-        client_id = session.query(Client).filter_by(name="").first()
-        commercial_id = self.prompt.input("employee number")
-
         contract = Contract(
             total_price=total_price,
             remaining_balance=remaining_balance,
+            client_id=client.id,
+            assigned_commercial=user.id,
             signature=signature,
-            client_id=client_id,
-            commercial_id=commercial_id,
         )
 
         self.data_manager.add(session, contract)
