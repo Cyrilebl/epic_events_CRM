@@ -1,5 +1,6 @@
 from .user_controller import UserController
 from .client_controller import ClientController
+from .contract_controller import ContractController
 from src.views import Menu, Formatter, SuccessMessage, ErrorMessage, UserInteraction
 from src.models import User, Client, Contract, Event
 
@@ -9,7 +10,8 @@ class MenuController:
         self.menu = Menu()
         self.formatter = Formatter()
         self.user_controller = UserController()
-        self.client_manager = ClientController()
+        self.client_controller = ClientController()
+        self.contract_controller = ContractController()
         self.success_message = SuccessMessage()
         self.error_message = ErrorMessage()
         self.user_interaction = UserInteraction()
@@ -67,7 +69,7 @@ class MenuController:
                 self.user_controller.delete_user(session)
 
             case 7:
-                pass
+                self.contract_controller.create_contract(session)
 
             case 8:
                 pass
@@ -75,7 +77,7 @@ class MenuController:
     def user_is_commercial(self, session, user_id, user_input):
         match user_input:
             case 4:
-                self.client_manager.create_client(session, user_id)
+                self.client_controller.create_client(session, user_id)
 
             case 5:
                 clients_assign_to_commercial = (
@@ -91,7 +93,7 @@ class MenuController:
                         break
                     self.error_message.invalid_id("client")
                 self.formatter.format_one_client(client)
-                self.client_manager.edit_client(session, client)
+                self.client_controller.edit_client(session, client)
 
     def user_is_support(self):
         pass
