@@ -36,12 +36,7 @@ class ContractController:
                 return record
             self.error_message.invalid_id(entity_name)
 
-    def create_contract(self, session):
-        total_price = self.get_valid_price("total price")
-        remaining_balance = self.get_valid_price("remaining balance")
-        client = self.get_valid_record(session, Client, "client")
-        user = self.get_valid_record(session, User, "user")
-
+    def get_valid_signature(self):
         while True:
             signature = self.prompt.input("signature (yes/no)").lower()
             if signature == "yes":
@@ -50,6 +45,14 @@ class ContractController:
             elif signature == "no":
                 signature = False
                 break
+        return signature
+
+    def create_contract(self, session):
+        total_price = self.get_valid_price("total price")
+        remaining_balance = self.get_valid_price("remaining balance")
+        client = self.get_valid_record(session, Client, "client")
+        user = self.get_valid_record(session, User, "user")
+        signature = self.get_valid_signature()
 
         contract = Contract(
             total_price=total_price,
@@ -66,44 +69,34 @@ class ContractController:
             "created",
         )
 
-    def edit_contract(self, session, user):
+    def edit_contract(self, session, contract):
         while True:
-            user_choice = self.prompt.user_choice(5)
+            user_choice = self.prompt.user_choice(3)
 
             match user_choice:
                 case 1:
                     self.data_manager.edit_field(
-                        session, user, "last_name", self.prompt.input("new last name")
+                        session,
+                        contract,
+                        "total_price",
+                        self.prompt.input("new total price"),
                     )
                 case 2:
                     self.data_manager.edit_field(
-                        session, user, "first_name", self.prompt.input("new first name")
+                        session,
+                        contract,
+                        "remaining_balance",
+                        self.prompt.input("remaining balance"),
                     )
                 case 3:
-                    while True:
-                        email = self.prompt.input("email")
-                        if Contract.validate_email(email):
-                            self.data_manager.edit_field(session, user, "email", email)
-                            break
-                        self.error_message.invalid_email()
-                case 4:
-                    while True:
-                        password = self.prompt.password(confirm=True)
-                        if Contract.validate_password(password):
-                            user.set_password(password)
-                            self.data_manager.edit_field(
-                                session, user, "password", password
-                            )
-                            break
-                        self.error_message.invalid_password()
-                case 5:
+                    signature = self.get_valid_signature()
                     self.data_manager.edit_field(
-                        session, user, "role_name", self.prompt.role()
+                        session, contract, "signature", signature
                     )
                     break
             break
 
         self.success_message.confirm_action(
-            f"{user.last_name.title()} {user.first_name.title()} ({user.role_name})",
+            f"Contract '{contract.id}'",
             "edited",
         )

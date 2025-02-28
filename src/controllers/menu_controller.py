@@ -39,6 +39,8 @@ class MenuController:
 
     def user_is_manager(self, session, user_input):
         users_data = session.query(User).all()
+        contracts_data = session.query(Contract).all()
+
         match user_input:
             case 4:
                 self.user_controller.create_user(session)
@@ -72,7 +74,17 @@ class MenuController:
                 self.contract_controller.create_contract(session)
 
             case 8:
-                pass
+                self.formatter.format_contracts(contracts_data)
+                while True:
+                    contract_id = self.user_interaction.prompt_user_selection(
+                        "contract", "modify"
+                    )
+                    contract = session.query(Contract).filter_by(id=contract_id).first()
+                    if contract:
+                        break
+                    self.error_message.invalid_id("contract")
+                self.formatter.format_one_contract(contract)
+                self.contract_controller.edit_contract(session, contract)
 
     def user_is_commercial(self, session, user_id, user_input):
         match user_input:
@@ -94,6 +106,22 @@ class MenuController:
                     self.error_message.invalid_id("client")
                 self.formatter.format_one_client(client)
                 self.client_controller.edit_client(session, client)
+
+            case 6:
+                contracts_assign_to_commercial = (
+                    session.query(Contract).filter_by(assigned_commercial=user_id).all()
+                )
+                self.formatter.format_contracts(contracts_assign_to_commercial)
+                while True:
+                    contract_id = self.user_interaction.prompt_user_selection(
+                        "contract", "modify"
+                    )
+                    contract = session.query(Contract).filter_by(id=contract_id).first()
+                    if contract:
+                        break
+                    self.error_message.invalid_id("contract")
+                self.formatter.format_one_contract(contract)
+                self.contract_controller.edit_contract(session, contract)
 
     def user_is_support(self):
         pass
