@@ -109,17 +109,25 @@ class Contract(Base):
     __tablename__ = "contracts"
 
     id = Column(Integer, primary_key=True)
-    total_price = Column(Float, index=True)
-    remaining_balance = Column(Float, index=True)
-    creation_date = Column(Date, index=True)
+    total_price = Column(Float, index=True, nullable=False)
+    remaining_balance = Column(Float, index=True, nullable=False)
+    creation_date = Column(
+        Date, default=func.current_date(), index=True, nullable=False
+    )
     signature = Column(Boolean, index=True, default=False)
 
-    client_id = Column(Integer, ForeignKey("clients.id"))
-    assigned_commercial = Column(Integer, ForeignKey("users.id"))
+    client_id = Column(Integer, ForeignKey("clients.id"), nullable=False)
+    assigned_commercial = Column(Integer, ForeignKey("users.id"), nullable=False)
 
     client = relationship("Client", back_populates="contracts")
     commercial = relationship("User", back_populates="contracts")
     event = relationship("Event", back_populates="contract")
+
+    @staticmethod
+    def validate_price(price):
+        price_str = f"{price:.2f}"
+        pattern = r"^\d+\.\d{2}$"
+        return re.match(pattern, price_str)
 
 
 class Event(Base):
