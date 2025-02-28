@@ -101,6 +101,23 @@ class Formatter:
 
         click.echo(tabulate(rows, headers, tablefmt="grid"))
 
+    def format_one_contract(self, contract):
+        headers = [
+            "1. Total price",
+            "2. Remaining balance",
+            "3. Signature",
+        ]
+
+        rows = [
+            [
+                contract.total_price,
+                contract.remaining_balance,
+                contract.signature,
+            ]
+        ]
+
+        click.echo(tabulate(rows, headers, tablefmt="grid"))
+
     def format_contracts(self, contracts_data):
         if not contracts_data:
             click.echo(click.style("No contracts available.", fg="yellow", bold=True))
@@ -116,6 +133,7 @@ class Formatter:
             "Assigned commercial",
         ]
 
+        sorted_contracts = sorted(contracts_data, key=lambda contract: contract.id)
         rows = [
             [
                 contract.id,
@@ -126,7 +144,7 @@ class Formatter:
                 contract.signature,
                 f"{contract.commercial.last_name} {contract.commercial.first_name}",
             ]
-            for contract in contracts_data
+            for contract in sorted_contracts
         ]
 
         click.echo(tabulate(rows, headers, tablefmt="grid"))
