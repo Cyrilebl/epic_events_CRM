@@ -25,6 +25,14 @@ class MenuController:
             case "support":
                 return self.menu.support()
 
+    def get_valid_record(self, session, model, entity_name, action):
+        while True:
+            record_id = self.user_interaction.prompt_user_selection(entity_name, action)
+            record = session.query(model).filter_by(id=record_id).first()
+            if record:
+                return record
+            self.error_message.invalid_id(entity_name)
+
     def show_data(self, session, user_input):
         match user_input:
             case 1:
@@ -47,27 +55,13 @@ class MenuController:
 
             case 5:
                 self.formatter.format_users(users_data)
-                while True:
-                    user_id = self.user_interaction.prompt_user_selection(
-                        "user", "modify"
-                    )
-                    user = session.query(User).filter_by(id=user_id).first()
-                    if user:
-                        break
-                    self.error_message.invalid_id("user")
+                user = self.get_valid_record(session, User, "user", "modify")
                 self.formatter.format_one_user(user)
                 self.user_controller.edit_user(session, user)
 
             case 6:
                 self.formatter.format_users(users_data)
-                while True:
-                    user_id = self.user_interaction.prompt_user_selection(
-                        "user", "delete"
-                    )
-                    user = session.query(User).filter_by(id=user_id).first()
-                    if user:
-                        break
-                    self.error_message.invalid_id("user")
+                user = self.get_valid_record(session, User, "user", "delete")
                 self.user_controller.delete_user(session)
 
             case 7:
@@ -75,14 +69,9 @@ class MenuController:
 
             case 8:
                 self.formatter.format_contracts(contracts_data)
-                while True:
-                    contract_id = self.user_interaction.prompt_user_selection(
-                        "contract", "modify"
-                    )
-                    contract = session.query(Contract).filter_by(id=contract_id).first()
-                    if contract:
-                        break
-                    self.error_message.invalid_id("contract")
+                contract = self.get_valid_record(
+                    session, Contract, "contract", "modify"
+                )
                 self.formatter.format_one_contract(contract)
                 self.contract_controller.edit_contract(session, contract)
 
@@ -96,14 +85,7 @@ class MenuController:
                     session.query(Client).filter_by(assigned_commercial=user_id).all()
                 )
                 self.formatter.format_clients(clients_assign_to_commercial)
-                while True:
-                    client_id = self.user_interaction.prompt_user_selection(
-                        "client", "modify"
-                    )
-                    client = session.query(Client).filter_by(id=client_id).first()
-                    if client:
-                        break
-                    self.error_message.invalid_id("client")
+                client = self.get_valid_record(session, Client, "client", "modify")
                 self.formatter.format_one_client(client)
                 self.client_controller.edit_client(session, client)
 
@@ -112,14 +94,9 @@ class MenuController:
                     session.query(Contract).filter_by(assigned_commercial=user_id).all()
                 )
                 self.formatter.format_contracts(contracts_assign_to_commercial)
-                while True:
-                    contract_id = self.user_interaction.prompt_user_selection(
-                        "contract", "modify"
-                    )
-                    contract = session.query(Contract).filter_by(id=contract_id).first()
-                    if contract:
-                        break
-                    self.error_message.invalid_id("contract")
+                contract = self.get_valid_record(
+                    session, Contract, "contract", "modify"
+                )
                 self.formatter.format_one_contract(contract)
                 self.contract_controller.edit_contract(session, contract)
 
