@@ -47,6 +47,15 @@ class ErrorMessage:
             )
         )
 
+    def invalid_number(self):
+        click.echo(
+            click.style(
+                "Invalid input. Please enter a number.",
+                fg="red",
+                bold=True,
+            )
+        )
+
 
 class SuccessMessage:
     def confirm_action(self, name, action):
