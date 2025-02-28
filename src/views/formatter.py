@@ -107,7 +107,8 @@ class Formatter:
             return
 
         headers = [
-            "Client ID",
+            "ID",
+            "Client",
             "Total price",
             "Remaining balance",
             "Creation date",
@@ -117,12 +118,13 @@ class Formatter:
 
         rows = [
             [
-                contract.client_id,
+                contract.id,
+                f"{contract.client.last_name} {contract.client.first_name}",
                 contract.total_price,
                 contract.remaining_balance,
                 contract.creation_date,
                 contract.signature,
-                contract.assigned_commercial,
+                f"{contract.commercial.last_name} {contract.commercial.first_name}",
             ]
             for contract in contracts_data
         ]
