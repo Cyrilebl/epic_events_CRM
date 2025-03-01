@@ -15,10 +15,7 @@ class ContractController:
         while True:
             price = self.prompt.input(prompt_text)
             try:
-                price = float(price)
-                price = round(price, 2)
-                if Contract.validate_price(price):
-                    return price
+                return round(float(price), 2)
             except ValueError:
                 self.error_message.invalid_number()
 
@@ -40,12 +37,10 @@ class ContractController:
         while True:
             signature = self.prompt.input("signature (yes/no)").lower()
             if signature == "yes":
-                signature = True
-                break
+                return True
             elif signature == "no":
-                signature = False
-                break
-        return signature
+                return False
+            self.error_message.invalid_format("signature")
 
     def create_contract(self, session):
         total_price = self.get_valid_price("total price")
