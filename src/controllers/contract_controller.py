@@ -46,14 +46,13 @@ class ContractController:
         total_price = self.get_valid_price("total price")
         remaining_balance = self.get_valid_price("remaining balance")
         client = self.get_valid_record(session, Client, "client")
-        user = self.get_valid_record(session, User, "user")
         signature = self.get_valid_signature()
 
         contract = Contract(
             total_price=total_price,
             remaining_balance=remaining_balance,
             client_id=client.id,
-            assigned_commercial=user.id,
+            assigned_commercial=client.assigned_commercial,
             signature=signature,
         )
 
