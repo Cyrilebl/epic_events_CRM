@@ -31,7 +31,7 @@ class MainController:
                     self.session, user_id, user_input
                 )
             elif role == "support":
-                self.menu_controller.user_is_support()
+                self.menu_controller.user_is_support(self.session, user_id, user_input)
             self.user_interaction.return_to_menu()
 
         # user = "test"
