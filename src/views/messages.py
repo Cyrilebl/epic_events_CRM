@@ -67,6 +67,15 @@ class ErrorMessage:
             )
         )
 
+    def no_assigned_support(self):
+        click.echo(
+            click.style(
+                "You are not assigned to any event",
+                fg="red",
+                bold=True,
+            )
+        )
+
 
 class SuccessMessage:
     def confirm_action(self, name, action):
