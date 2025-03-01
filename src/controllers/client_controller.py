@@ -93,7 +93,6 @@ class ClientController:
                         "information",
                         self.prompt.input("information"),
                     )
-                    break
             break
 
         self.success_message.confirm_action(

@@ -94,7 +94,6 @@ class UserController:
                     self.data_manager.edit_field(
                         session, user, "role_name", self.prompt.role()
                     )
-                    break
             break
 
         self.success_message.confirm_action(
