@@ -92,10 +92,10 @@ class MenuController:
                 self.client_controller.edit_client(session, client)
 
             case 6:
-                contracts_assign_to_commercial = (
+                contracts_assigned_to_commercial = (
                     session.query(Contract).filter_by(assigned_commercial=user_id).all()
                 )
-                self.formatter.format_contracts(contracts_assign_to_commercial)
+                self.formatter.format_contracts(contracts_assigned_to_commercial)
                 contract = self.get_valid_record(
                     session, Contract, "contract", "modify"
                 )
@@ -103,12 +103,24 @@ class MenuController:
                 self.contract_controller.edit_contract(session, contract)
 
             case 7:
-                clients_assign_to_commercial = (
+                clients_assigned_to_commercial = (
                     session.query(Client).filter_by(assigned_commercial=user_id).all()
                 )
                 self.event_controller.create_event(
-                    session, clients_assign_to_commercial
+                    session, clients_assigned_to_commercial
                 )
 
-    def user_is_support(self):
-        pass
+    def user_is_support(self, session, user_id, user_input):
+        match user_input:
+            case 4:
+                events_assigned_to_support = (
+                    session.query(Event).filter_by(assigned_support=user_id).all()
+                )
+                display_events = self.formatter.format_events(
+                    events_assigned_to_support
+                )
+                if not display_events:
+                    return self.error_message.no_assigned_support()
+                event = self.get_valid_record(session, Event, "event", "modify")
+                self.formatter.format_one_event(event)
+                self.event_controller.edit_event(session, event)
