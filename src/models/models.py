@@ -86,7 +86,7 @@ class Client(Base):
     creation_date = Column(
         Date, default=func.current_date(), index=True, nullable=False
     )
-    last_update_date = Column(Date)
+    last_update_date = Column(Date, onupdate=func.current_date())
 
     assigned_commercial = Column(Integer, ForeignKey("users.id"), nullable=False)
 
