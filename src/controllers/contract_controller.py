@@ -1,4 +1,4 @@
-from src.models import User, Client, Contract, DataManager
+from src.models import Client, Contract, DataManager
 from src.views import Prompt, Formatter, ErrorMessage, SuccessMessage, UserInteraction
 
 
@@ -87,7 +87,6 @@ class ContractController:
                     self.data_manager.edit_field(
                         session, contract, "signature", signature
                     )
-                    break
             break
 
         self.success_message.confirm_action(
