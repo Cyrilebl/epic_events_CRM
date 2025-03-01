@@ -58,6 +58,15 @@ class ErrorMessage:
             )
         )
 
+    def no_signed_contract(self):
+        click.echo(
+            click.style(
+                "This client doesn't have any signed contract",
+                fg="red",
+                bold=True,
+            )
+        )
+
 
 class SuccessMessage:
     def confirm_action(self, name, action):
