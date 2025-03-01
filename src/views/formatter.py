@@ -151,10 +151,39 @@ class Formatter:
         click.echo(tabulate(rows, headers, tablefmt="grid"))
         return True
 
+    def format_one_event(self, event):
+        headers = [
+            "1. Start date",
+            "2. End date",
+            "3. Street number",
+            "4. Street name",
+            "5. Postal code",
+            "6. City",
+            "7. Country",
+            "8. Attendees",
+            "9. Notes",
+        ]
+
+        rows = [
+            [
+                event.start_data,
+                event.end_data,
+                event.street_number,
+                event.street_name,
+                event.postal_code,
+                event.city,
+                event.country,
+                event.attendees,
+                event.notes,
+            ]
+        ]
+
+        click.echo(tabulate(rows, headers, tablefmt="grid"))
+
     def format_events(self, events_data):
         if not events_data:
             click.echo(click.style("No events scheduled.", fg="yellow", bold=True))
-            return
+            return False
 
         headers = [
             "Event ID",
@@ -190,3 +219,4 @@ class Formatter:
         ]
 
         click.echo(tabulate(rows, headers, tablefmt="grid"))
+        return True
