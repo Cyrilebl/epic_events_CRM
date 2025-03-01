@@ -21,6 +21,9 @@ class Prompt:
             ),
         )
 
+    def datetime_input(self, label):
+        return click.prompt(click.style(label, fg="blue", bold=True))
+
     def user_choice(self, number_of_choices):
         while True:
             try:
