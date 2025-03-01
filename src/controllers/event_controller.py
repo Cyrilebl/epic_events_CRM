@@ -34,7 +34,7 @@ class EventController:
             except ValueError:
                 self.error_message.invalid_number()
 
-    def create_event(self, session, clients_assign_to_commercial):
+    def create_event(self, session, clients_assigned_to_commercial):
         start_date = self.get_valid_date("start date (YYYY-MM-DD HH:MM AM/PM)")
         end_date = self.get_valid_date("end date (YYYY-MM-DD HH:MM AM/PM)")
         street_number = self.prompt.input("street number")
@@ -45,7 +45,7 @@ class EventController:
         attendees = self.get_valid_integer("number of attendees")
         notes = self.prompt.input("notes")
 
-        display_clients = self.formatter.format_clients(clients_assign_to_commercial)
+        display_clients = self.formatter.format_clients(clients_assigned_to_commercial)
         if not display_clients:
             return
 
@@ -61,7 +61,7 @@ class EventController:
         )
         display_contracts = self.formatter.format_contracts(contracts)
         if not display_contracts:
-            self.error_message.no_signed_contract()
+            return self.error_message.no_signed_contract()
 
         contract = self.get_valid_record(session, Contract, "contract")
 
@@ -92,33 +92,74 @@ class EventController:
 
             match user_choice:
                 case 1:
+                    start_date = self.get_valid_date(
+                        "new start date (YYYY-MM-DD HH:MM AM/PM)"
+                    )
                     self.data_manager.edit_field(
                         session,
                         event,
-                        "total_price",
-                        self.prompt.input("new total price"),
+                        "start_date",
+                        self.prompt.datetime_input(start_date),
                     )
                 case 2:
+                    end_date = self.get_valid_date(
+                        "new end date (YYYY-MM-DD HH:MM AM/PM)"
+                    )
                     self.data_manager.edit_field(
                         session,
                         event,
-                        "remaining_balance",
-                        self.prompt.input("remaining balance"),
+                        "end_date",
+                        self.prompt.datetime_input(end_date),
                     )
                 case 3:
-                    pass
+                    self.data_manager.edit_field(
+                        session,
+                        event,
+                        "street_number",
+                        self.prompt.input("street number"),
+                    )
                 case 4:
-                    pass
+                    self.data_manager.edit_field(
+                        session,
+                        event,
+                        "street_name",
+                        self.prompt.input("street name"),
+                    )
                 case 5:
-                    pass
+                    self.data_manager.edit_field(
+                        session,
+                        event,
+                        "postal_code",
+                        self.prompt.input("postal code"),
+                    )
                 case 6:
-                    pass
+                    self.data_manager.edit_field(
+                        session,
+                        event,
+                        "city",
+                        self.prompt.input("city"),
+                    )
                 case 7:
-                    pass
+                    self.data_manager.edit_field(
+                        session,
+                        event,
+                        "country",
+                        self.prompt.input("country"),
+                    )
                 case 8:
-                    pass
+                    self.data_manager.edit_field(
+                        session,
+                        event,
+                        "attendees",
+                        self.prompt.input("number of attendees"),
+                    )
                 case 9:
-                    pass
+                    self.data_manager.edit_field(
+                        session,
+                        event,
+                        "notes",
+                        self.prompt.input("notes"),
+                    )
             break
 
         self.success_message.confirm_action(
