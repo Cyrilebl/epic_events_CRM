@@ -67,7 +67,7 @@ class Formatter:
     def format_clients(self, clients_data):
         if not clients_data:
             click.echo(click.style("No current clients.", fg="yellow", bold=True))
-            return
+            return False
 
         headers = [
             "ID",
@@ -100,6 +100,7 @@ class Formatter:
         ]
 
         click.echo(tabulate(rows, headers, tablefmt="grid"))
+        return True
 
     def format_one_contract(self, contract):
         headers = [
@@ -121,7 +122,7 @@ class Formatter:
     def format_contracts(self, contracts_data):
         if not contracts_data:
             click.echo(click.style("No contracts available.", fg="yellow", bold=True))
-            return
+            return False
 
         headers = [
             "ID",
@@ -148,6 +149,7 @@ class Formatter:
         ]
 
         click.echo(tabulate(rows, headers, tablefmt="grid"))
+        return True
 
     def format_events(self, events_data):
         if not events_data:
@@ -155,8 +157,10 @@ class Formatter:
             return
 
         headers = [
-            "Client ID",
+            "Event ID",
             "Contract ID",
+            "Client name",
+            "Client contact",
             "Start date",
             "End date",
             "Location",
@@ -167,14 +171,20 @@ class Formatter:
 
         rows = [
             [
-                event.client_id,
+                event.id,
                 event.contract_id,
+                f"{event.client.last_name} {event.client.first_name}",
+                f"{event.client.email}/{event.client.phone_number}",
                 event.start_date,
                 event.end_date,
                 f"{event.street_number} {event.street_name}, {event.postal_code} {event.city}, {event.country}",
                 event.attendees,
                 event.notes,
-                event.assigned_support,
+                (
+                    f"{event.support.last_name} {event.support.first_name}"
+                    if event.assigned_support
+                    else None
+                ),
             ]
             for event in events_data
         ]
