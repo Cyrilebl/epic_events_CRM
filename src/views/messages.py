@@ -24,9 +24,11 @@ class ErrorMessage:
             )
         )
 
-    def invalid_email(self):
+    def invalid_format(self, name):
         click.echo(
-            click.style("Invalid email format. Please try again.", fg="red", bold=True)
+            click.style(
+                f"Invalid {name} format. Please try again.", fg="red", bold=True
+            )
         )
 
     def invalid_password(self):
