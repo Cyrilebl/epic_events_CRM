@@ -17,7 +17,7 @@ class ClientController:
             email = self.prompt.input("email")
             if Client.validate_email(email):
                 break
-            self.error_message.invalid_email()
+            self.error_message.invalid_format("email")
 
         while True:
             phone_number = self.prompt.input("phone number")
@@ -69,7 +69,7 @@ class ClientController:
                                 session, client, "email", email
                             )
                             break
-                        self.error_message.invalid_email()
+                        self.error_message.invalid_format("email")
                 case 4:
                     while True:
                         phone_number = self.prompt.input("phone number")
