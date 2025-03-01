@@ -1,6 +1,7 @@
 from .user_controller import UserController
 from .client_controller import ClientController
 from .contract_controller import ContractController
+from .event_controller import EventController
 from src.views import Menu, Formatter, SuccessMessage, ErrorMessage, UserInteraction
 from src.models import User, Client, Contract, Event
 
@@ -12,6 +13,7 @@ class MenuController:
         self.user_controller = UserController()
         self.client_controller = ClientController()
         self.contract_controller = ContractController()
+        self.event_controller = EventController()
         self.success_message = SuccessMessage()
         self.error_message = ErrorMessage()
         self.user_interaction = UserInteraction()
@@ -99,6 +101,9 @@ class MenuController:
                 )
                 self.formatter.format_one_contract(contract)
                 self.contract_controller.edit_contract(session, contract)
+
+            case 7:
+                self.event_controller.create_event(session)
 
     def user_is_support(self):
         pass
