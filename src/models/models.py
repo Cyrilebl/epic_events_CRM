@@ -1,15 +1,16 @@
 import re
-
+from datetime import datetime
 import bcrypt
 from sqlalchemy import (
     Boolean,
     CheckConstraint,
     Column,
     Date,
-    Float,
+    DECIMAL,
     ForeignKey,
     Integer,
     String,
+    Text,
     func,
 )
 from sqlalchemy.orm import declarative_base, relationship
@@ -35,12 +36,12 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)
-    first_name = Column(String, index=True, nullable=False)
-    last_name = Column(String, index=True, nullable=False)
-    email = Column(String, index=True, unique=True, nullable=False)
-    password_hash = Column(String, nullable=False)
+    first_name = Column(String(100), index=True, nullable=False)
+    last_name = Column(String(100), index=True, nullable=False)
+    email = Column(String(255), index=True, unique=True, nullable=False)
+    password_hash = Column(String(255), nullable=False)
 
-    role_name = Column(String, ForeignKey("roles.name"), nullable=False)
+    role_name = Column(String(10), ForeignKey("roles.name"), nullable=False)
 
     role = relationship("Role", back_populates="users")
     clients = relationship("Client", back_populates="commercial")
@@ -48,7 +49,7 @@ class User(Base):
     events = relationship("Event", back_populates="support")
 
     def __repr__(self):
-        return f"{self.first_name} {self.last_name} {self.email} {self.role_name}"
+        return f"{self.first_name} {self.last_name} ({self.email} - {self.role_name})"
 
     @staticmethod
     def validate_email(email):
@@ -77,12 +78,12 @@ class Client(Base):
     __tablename__ = "clients"
 
     id = Column(Integer, primary_key=True)
-    first_name = Column(String, index=True, nullable=False)
-    last_name = Column(String, index=True, nullable=False)
-    email = Column(String, index=True, unique=True, nullable=False)
-    phone_number = Column(String, index=True, nullable=False)
-    company_name = Column(String, index=True)
-    information = Column(String, nullable=False)
+    first_name = Column(String(100), index=True, nullable=False)
+    last_name = Column(String(100), index=True, nullable=False)
+    email = Column(String(255), index=True, unique=True, nullable=False)
+    phone_number = Column(String(20), index=True, nullable=False)
+    company_name = Column(String(255), index=True)
+    information = Column(Text, nullable=False)
     creation_date = Column(
         Date, default=func.current_date(), index=True, nullable=False
     )
@@ -109,41 +110,53 @@ class Contract(Base):
     __tablename__ = "contracts"
 
     id = Column(Integer, primary_key=True)
-    total_price = Column(Float, index=True, nullable=False)
-    remaining_balance = Column(Float, index=True, nullable=False)
+    total_price = Column(DECIMAL(10, 2), index=True, nullable=False)
+    remaining_balance = Column(DECIMAL(10, 2), index=True, nullable=False)
     creation_date = Column(
         Date, default=func.current_date(), index=True, nullable=False
     )
     signature = Column(Boolean, index=True, default=False)
 
-    client_id = Column(Integer, ForeignKey("clients.id"), nullable=False)
-    assigned_commercial = Column(Integer, ForeignKey("users.id"), nullable=False)
+    client_id = Column(Integer, ForeignKey("clients.id"), index=True, nullable=False)
+    assigned_commercial = Column(
+        Integer, ForeignKey("users.id"), index=True, nullable=False
+    )
 
     client = relationship("Client", back_populates="contracts")
     commercial = relationship("User", back_populates="contracts")
     event = relationship("Event", back_populates="contract")
-
-    @staticmethod
-    def validate_price(price):
-        price_str = f"{price:.2f}"
-        pattern = r"^\d+\.\d{2}$"
-        return re.match(pattern, price_str)
 
 
 class Event(Base):
     __tablename__ = "events"
 
     id = Column(Integer, primary_key=True)
-    start_date = Column(Date, index=True)
-    end_date = Column(Date, index=True)
-    location = Column(String)
-    attendees = Column(Integer)
-    notes = Column(String)
+    start_date = Column(Date, index=True, nullable=False)
+    end_date = Column(Date, index=True, nullable=False)
 
-    client_id = Column(Integer, ForeignKey("clients.id"))
-    contract_id = Column(Integer, ForeignKey("contracts.id"))
-    assigned_support = Column(Integer, ForeignKey("users.id"))
+    street_number = Column(String(10), nullable=False)
+    street_name = Column(String(255), nullable=False)
+    postal_code = Column(String(10), nullable=False)
+    city = Column(String(100), nullable=False)
+    country = Column(String(100), nullable=False)
+
+    attendees = Column(Integer, nullable=False)
+    notes = Column(Text)
+
+    client_id = Column(Integer, ForeignKey("clients.id"), index=True, nullable=False)
+    contract_id = Column(
+        Integer, ForeignKey("contracts.id"), index=True, nullable=False
+    )
+    assigned_support = Column(Integer, ForeignKey("users.id"), index=True)
 
     client = relationship("Client", back_populates="events")
     contract = relationship("Contract", back_populates="event")
     support = relationship("User", back_populates="events")
+
+    @staticmethod
+    def validate_date(date):
+        try:
+            datetime.strptime(date, "%Y-%m-%d")
+            return True
+        except ValueError:
+            return False
