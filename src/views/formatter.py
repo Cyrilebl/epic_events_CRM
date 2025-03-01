@@ -171,7 +171,7 @@ class Formatter:
                 event.contract_id,
                 event.start_date,
                 event.end_date,
-                event.location,
+                f"{event.street_number} {event.street_name}, {event.postal_code} {event.city}, {event.country}",
                 event.attendees,
                 event.notes,
                 event.assigned_support,
