@@ -103,7 +103,12 @@ class MenuController:
                 self.contract_controller.edit_contract(session, contract)
 
             case 7:
-                self.event_controller.create_event(session)
+                clients_assign_to_commercial = (
+                    session.query(Client).filter_by(assigned_commercial=user_id).all()
+                )
+                self.event_controller.create_event(
+                    session, clients_assign_to_commercial
+                )
 
     def user_is_support(self):
         pass
