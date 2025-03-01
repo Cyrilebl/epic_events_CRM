@@ -34,7 +34,7 @@ class UserController:
             email = self.prompt.input("email")
             if User.validate_email(email):
                 break
-            self.error_message.invalid_email()
+            self.error_message.invalid_format("email")
 
         while True:
             password = self.prompt.password(confirm=True)
@@ -79,7 +79,7 @@ class UserController:
                         if User.validate_email(email):
                             self.data_manager.edit_field(session, user, "email", email)
                             break
-                        self.error_message.invalid_email()
+                        self.error_message.invalid_format("email")
                 case 4:
                     while True:
                         password = self.prompt.password(confirm=True)
