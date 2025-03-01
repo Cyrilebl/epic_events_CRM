@@ -156,7 +156,6 @@ class Event(Base):
     @staticmethod
     def validate_date(date):
         try:
-            datetime.strptime(date, "%Y-%m-%d")
-            return True
+            return datetime.strptime(date, "%Y-%m-%d %I:%M %p")
         except ValueError:
-            return False
+            return None
