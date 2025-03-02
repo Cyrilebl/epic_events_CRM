@@ -58,24 +58,6 @@ class ErrorMessage:
             )
         )
 
-    def no_signed_contract(self):
-        click.echo(
-            click.style(
-                "This client doesn't have any signed contract",
-                fg="red",
-                bold=True,
-            )
-        )
-
-    def no_assigned_support(self):
-        click.echo(
-            click.style(
-                "You are not assigned to any event",
-                fg="red",
-                bold=True,
-            )
-        )
-
 
 class SuccessMessage:
     def confirm_action(self, name, action):
