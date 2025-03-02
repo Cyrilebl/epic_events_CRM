@@ -1,16 +1,17 @@
 from src.models import Role, User, DataManager
 from src.views import Prompt, ErrorMessage, SuccessMessage
-
+from .validation_controller import ValidationController
 from .token import Token
 
 
 class UserController:
     def __init__(self):
-        self.token = Token()
         self.data_manager = DataManager()
         self.prompt = Prompt()
         self.error_message = ErrorMessage()
         self.success_message = SuccessMessage()
+        self.token = Token()
+        self.validation = ValidationController()
 
     def login(self, session):
         while True:
@@ -26,25 +27,11 @@ class UserController:
             token = self.token.generate_token(user.id, user.role.name)
             return token
 
-    def get_valid_email(self):
-        while True:
-            email = self.prompt.input("email")
-            if User.validate_email(email):
-                return email
-            self.error_message.invalid_format("email")
-
-    def get_valid_password(self):
-        while True:
-            password = self.prompt.password(confirm=True)
-            if User.validate_password(password):
-                return password
-            self.error_message.invalid_password()
-
     def create_user(self, session):
         last_name = self.prompt.input("last name")
         first_name = self.prompt.input("first name")
-        email = self.get_valid_email()
-        password = self.get_valid_password()
+        email = self.validation.get_valid_email()
+        password = self.validation.get_valid_password()
         role_name = self.prompt.role()
         role = session.query(Role).filter_by(name=role_name).first()
 
@@ -77,10 +64,10 @@ class UserController:
                         session, user, "first_name", self.prompt.input("new first name")
                     )
                 case 3:
-                    email = self.get_valid_email()
+                    email = self.validation.get_valid_email()
                     self.data_manager.edit_field(session, user, "email", email)
                 case 4:
-                    password = self.get_valid_password()
+                    password = self.validation.get_valid_password()
                     user.set_password(password)
                     self.data_manager.edit_field(session, user, "password", password)
                 case 5:

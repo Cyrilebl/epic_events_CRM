@@ -1,5 +1,6 @@
 from src.models import Client, Contract, DataManager
-from src.views import Prompt, Formatter, ErrorMessage, SuccessMessage, UserInteraction
+from src.views import Prompt, Formatter, SuccessMessage
+from .validation_controller import ValidationController
 
 
 class ContractController:
@@ -7,59 +8,32 @@ class ContractController:
         self.data_manager = DataManager()
         self.prompt = Prompt()
         self.formatter = Formatter()
-        self.error_message = ErrorMessage()
         self.success_message = SuccessMessage()
-        self.user_interaction = UserInteraction()
-
-    def get_valid_price(self, prompt_text):
-        while True:
-            price = self.prompt.input(prompt_text)
-            try:
-                return round(float(price), 2)
-            except ValueError:
-                self.error_message.invalid_number()
-
-    def get_valid_record(self, session, model, entity_name):
-        records = session.query(model).all()
-        (
-            self.formatter.format_clients(records)
-            if model == Client
-            else self.formatter.format_users(records)
-        )
-        while True:
-            record_id = self.user_interaction.prompt_user_selection(entity_name, "add")
-            record = session.query(model).filter_by(id=record_id).first()
-            if record:
-                return record
-            self.error_message.invalid_id(entity_name)
-
-    def get_valid_signature(self):
-        while True:
-            signature = self.prompt.input("signature (yes/no)").lower()
-            if signature == "yes":
-                return True
-            elif signature == "no":
-                return False
-            self.error_message.invalid_format("signature")
+        self.validation = ValidationController()
 
     def create_contract(self, session):
-        total_price = self.get_valid_price("total price")
-        remaining_balance = self.get_valid_price("remaining balance")
-        client = self.get_valid_record(session, Client, "client")
-        signature = self.get_valid_signature()
+        total_price = self.validation.get_valid_price("total price")
+        remaining_balance = self.validation.get_valid_price("remaining balance")
+        signature = self.validation.get_valid_signature()
+
+        clients = session.query(Client).all()
+        display_clients = self.formatter.format_clients(clients)
+        if not display_clients:
+            return
+        client = self.validation.get_valid_record(session, Client, "client", "add")
 
         contract = Contract(
             total_price=total_price,
             remaining_balance=remaining_balance,
+            signature=signature,
             client_id=client.id,
             assigned_commercial=client.assigned_commercial,
-            signature=signature,
         )
 
         self.data_manager.add(session, contract)
 
         self.success_message.confirm_action(
-            "contract".title(),
+            f"Contract nº{contract.id}",
             "created",
         )
 
@@ -69,27 +43,25 @@ class ContractController:
 
             match user_choice:
                 case 1:
+                    total_price = self.validation.get_valid_price("total price")
                     self.data_manager.edit_field(
-                        session,
-                        contract,
-                        "total_price",
-                        self.prompt.input("new total price"),
+                        session, contract, "total_price", total_price
                     )
                 case 2:
+                    remaining_balance = self.validation.get_valid_price(
+                        "remaining balance"
+                    )
                     self.data_manager.edit_field(
-                        session,
-                        contract,
-                        "remaining_balance",
-                        self.prompt.input("remaining balance"),
+                        session, contract, "remaining_balance", remaining_balance
                     )
                 case 3:
-                    signature = self.get_valid_signature()
+                    signature = self.validation.get_valid_signature()
                     self.data_manager.edit_field(
                         session, contract, "signature", signature
                     )
             break
 
         self.success_message.confirm_action(
-            f"Contract '{contract.id}'",
+            f"Contract nº{contract.id}",
             "edited",
         )

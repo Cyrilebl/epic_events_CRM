@@ -1,5 +1,3 @@
-import re
-from datetime import datetime
 import bcrypt
 from sqlalchemy import (
     Boolean,
@@ -48,19 +46,6 @@ class User(Base):
     contracts = relationship("Contract", back_populates="commercial")
     events = relationship("Event", back_populates="support")
 
-    def __repr__(self):
-        return f"{self.first_name} {self.last_name} ({self.email} - {self.role_name})"
-
-    @staticmethod
-    def validate_email(email):
-        pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
-        return re.match(pattern, email)
-
-    @staticmethod
-    def validate_password(password):
-        pattern = r"^(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$"
-        return re.match(pattern, password)
-
     def set_password(self, password):
         """Hash password"""
         salt = bcrypt.gensalt()
@@ -94,16 +79,6 @@ class Client(Base):
     commercial = relationship("User", back_populates="clients")
     contracts = relationship("Contract", back_populates="client")
     events = relationship("Event", back_populates="client")
-
-    @staticmethod
-    def validate_email(email):
-        pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
-        return re.match(pattern, email)
-
-    @staticmethod
-    def validate_phone_number(phone_number):
-        pattern = r"^\+\d{2,3} \d{3} \d{3} \d{3}$"
-        return re.match(pattern, phone_number)
 
 
 class Contract(Base):
@@ -152,10 +127,3 @@ class Event(Base):
     client = relationship("Client", back_populates="events")
     contract = relationship("Contract", back_populates="event")
     support = relationship("User", back_populates="events")
-
-    @staticmethod
-    def validate_date(date):
-        try:
-            return datetime.strptime(date, "%Y-%m-%d %I:%M %p")
-        except ValueError:
-            return None

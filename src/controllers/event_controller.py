@@ -1,5 +1,6 @@
 from src.models import Client, Contract, Event, DataManager
-from src.views import Prompt, Formatter, ErrorMessage, SuccessMessage, UserInteraction
+from src.views import Prompt, Formatter, SuccessMessage
+from .validation_controller import ValidationController
 
 
 class EventController:
@@ -7,49 +8,30 @@ class EventController:
         self.data_manager = DataManager()
         self.prompt = Prompt()
         self.formatter = Formatter()
-        self.error_message = ErrorMessage()
         self.success_message = SuccessMessage()
-        self.user_interaction = UserInteraction()
+        self.validation = ValidationController()
 
-    def get_valid_record(self, session, model, entity_name):
-        while True:
-            record_id = self.user_interaction.prompt_user_selection(entity_name, "add")
-            record = session.query(model).filter_by(id=record_id).first()
-            if record:
-                return record
-            self.error_message.invalid_id(entity_name)
-
-    def get_valid_date(self, prompt_text):
-        while True:
-            date_input = self.prompt.datetime_input(prompt_text)
-            if Event.validate_date(date_input):
-                return date_input
-            self.error_message.invalid_format("date")
-
-    def get_valid_integer(self, prompt_text):
-        while True:
-            user_input = self.prompt.input(prompt_text)
-            try:
-                return int(user_input)
-            except ValueError:
-                self.error_message.invalid_number()
-
-    def create_event(self, session, clients_assigned_to_commercial):
-        start_date = self.get_valid_date("start date (YYYY-MM-DD HH:MM AM/PM)")
-        end_date = self.get_valid_date("end date (YYYY-MM-DD HH:MM AM/PM)")
+    def create_event(self, session, user_id):
+        start_date = self.validation.get_valid_date(
+            "start date (YYYY-MM-DD HH:MM AM/PM)"
+        )
+        end_date = self.validation.get_valid_date("end date (YYYY-MM-DD HH:MM AM/PM)")
         street_number = self.prompt.input("street number")
         street_name = self.prompt.input("street name")
         postal_code = self.prompt.input("postal code")
         city = self.prompt.input("city")
         country = self.prompt.input("country")
-        attendees = self.get_valid_integer("number of attendees")
+        attendees = self.validation.get_valid_integer("number of attendees")
         notes = self.prompt.input("notes")
 
+        clients_assigned_to_commercial = (
+            session.query(Client).filter_by(assigned_commercial=user_id).all()
+        )
         display_clients = self.formatter.format_clients(clients_assigned_to_commercial)
         if not display_clients:
             return
 
-        client = self.get_valid_record(session, Client, "client")
+        client = self.validation.get_valid_record(session, Client, "client", "add")
 
         contracts = (
             session.query(Contract)
@@ -61,9 +43,11 @@ class EventController:
         )
         display_contracts = self.formatter.format_contracts(contracts)
         if not display_contracts:
-            return self.error_message.no_signed_contract()
+            return
 
-        contract = self.get_valid_record(session, Contract, "contract")
+        contract = self.validation.get_valid_record(
+            session, Contract, "contract", "add"
+        )
 
         event = Event(
             start_date=start_date,
@@ -82,7 +66,7 @@ class EventController:
         self.data_manager.add(session, event)
 
         self.success_message.confirm_action(
-            "event".title(),
+            f"Event nº{event.id}",
             "created",
         )
 
@@ -92,25 +76,17 @@ class EventController:
 
             match user_choice:
                 case 1:
-                    start_date = self.get_valid_date(
+                    start_date = self.validation.get_valid_date(
                         "new start date (YYYY-MM-DD HH:MM AM/PM)"
                     )
                     self.data_manager.edit_field(
-                        session,
-                        event,
-                        "start_date",
-                        self.prompt.datetime_input(start_date),
+                        session, event, "start_date", start_date
                     )
                 case 2:
-                    end_date = self.get_valid_date(
+                    end_date = self.validation.get_valid_date(
                         "new end date (YYYY-MM-DD HH:MM AM/PM)"
                     )
-                    self.data_manager.edit_field(
-                        session,
-                        event,
-                        "end_date",
-                        self.prompt.datetime_input(end_date),
-                    )
+                    self.data_manager.edit_field(session, event, "end_date", end_date)
                 case 3:
                     self.data_manager.edit_field(
                         session,
@@ -147,12 +123,8 @@ class EventController:
                         self.prompt.input("country"),
                     )
                 case 8:
-                    self.data_manager.edit_field(
-                        session,
-                        event,
-                        "attendees",
-                        self.prompt.input("number of attendees"),
-                    )
+                    attendees = self.validation.get_valid_integer("number of attendees")
+                    self.data_manager.edit_field(session, event, "attendees", attendees)
                 case 9:
                     self.data_manager.edit_field(
                         session,
@@ -163,6 +135,6 @@ class EventController:
             break
 
         self.success_message.confirm_action(
-            f"Event '{event.id}'",
+            f"Event nº{event.id}",
             "edited",
         )

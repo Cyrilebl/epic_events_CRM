@@ -1,9 +1,10 @@
+from src.views import Menu, Formatter
+from src.models import User, Client, Contract, Event
 from .user_controller import UserController
 from .client_controller import ClientController
 from .contract_controller import ContractController
 from .event_controller import EventController
-from src.views import Menu, Formatter, SuccessMessage, ErrorMessage, UserInteraction
-from src.models import User, Client, Contract, Event
+from .validation_controller import ValidationController
 
 
 class MenuController:
@@ -14,9 +15,7 @@ class MenuController:
         self.client_controller = ClientController()
         self.contract_controller = ContractController()
         self.event_controller = EventController()
-        self.success_message = SuccessMessage()
-        self.error_message = ErrorMessage()
-        self.user_interaction = UserInteraction()
+        self.validation = ValidationController()
 
     def show_menu(self, role):
         match role:
@@ -26,14 +25,6 @@ class MenuController:
                 return self.menu.commercial()
             case "support":
                 return self.menu.support()
-
-    def get_valid_record(self, session, model, entity_name, action):
-        while True:
-            record_id = self.user_interaction.prompt_user_selection(entity_name, action)
-            record = session.query(model).filter_by(id=record_id).first()
-            if record:
-                return record
-            self.error_message.invalid_id(entity_name)
 
     def show_data(self, session, user_input):
         match user_input:
@@ -57,13 +48,13 @@ class MenuController:
 
             case 5:
                 self.formatter.format_users(users_data)
-                user = self.get_valid_record(session, User, "user", "modify")
+                user = self.validation.get_valid_record(session, User, "user", "modify")
                 self.formatter.format_one_user(user)
                 self.user_controller.edit_user(session, user)
 
             case 6:
                 self.formatter.format_users(users_data)
-                user = self.get_valid_record(session, User, "user", "delete")
+                user = self.validation.get_valid_record(session, User, "user", "delete")
                 self.user_controller.delete_user(session)
 
             case 7:
@@ -71,7 +62,7 @@ class MenuController:
 
             case 8:
                 self.formatter.format_contracts(contracts_data)
-                contract = self.get_valid_record(
+                contract = self.validation.get_valid_record(
                     session, Contract, "contract", "modify"
                 )
                 self.formatter.format_one_contract(contract)
@@ -87,7 +78,9 @@ class MenuController:
                     session.query(Client).filter_by(assigned_commercial=user_id).all()
                 )
                 self.formatter.format_clients(clients_assign_to_commercial)
-                client = self.get_valid_record(session, Client, "client", "modify")
+                client = self.validation.get_valid_record(
+                    session, Client, "client", "modify"
+                )
                 self.formatter.format_one_client(client)
                 self.client_controller.edit_client(session, client)
 
@@ -96,19 +89,14 @@ class MenuController:
                     session.query(Contract).filter_by(assigned_commercial=user_id).all()
                 )
                 self.formatter.format_contracts(contracts_assigned_to_commercial)
-                contract = self.get_valid_record(
+                contract = self.validation.get_valid_record(
                     session, Contract, "contract", "modify"
                 )
                 self.formatter.format_one_contract(contract)
                 self.contract_controller.edit_contract(session, contract)
 
             case 7:
-                clients_assigned_to_commercial = (
-                    session.query(Client).filter_by(assigned_commercial=user_id).all()
-                )
-                self.event_controller.create_event(
-                    session, clients_assigned_to_commercial
-                )
+                self.event_controller.create_event(session, user_id)
 
     def user_is_support(self, session, user_id, user_input):
         match user_input:
@@ -120,7 +108,9 @@ class MenuController:
                     events_assigned_to_support
                 )
                 if not display_events:
-                    return self.error_message.no_assigned_support()
-                event = self.get_valid_record(session, Event, "event", "modify")
+                    return
+                event = self.validation.get_valid_record(
+                    session, Event, "event", "modify"
+                )
                 self.formatter.format_one_event(event)
                 self.event_controller.edit_event(session, event)
