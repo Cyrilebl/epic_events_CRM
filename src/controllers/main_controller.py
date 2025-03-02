@@ -23,15 +23,26 @@ class MainController:
         # Menu
         while True:
             user_input = self.menu_controller.show_menu(role)
+
+            # Logout
+            if user_input == "logout":
+                self.user_controller.logout()
+                break
+
             self.menu_controller.show_data(self.session, user_input)
-            if role == "manager":
-                self.menu_controller.user_is_manager(self.session, user_input)
-            elif role == "commercial":
-                self.menu_controller.user_is_commercial(
-                    self.session, user_id, user_input
-                )
-            elif role == "support":
-                self.menu_controller.user_is_support(self.session, user_id, user_input)
+
+            match role:
+                case "manager":
+                    self.menu_controller.user_is_manager(self.session, user_input)
+                case "commercial":
+                    self.menu_controller.user_is_commercial(
+                        self.session, user_id, user_input
+                    )
+                case "support":
+                    self.menu_controller.user_is_support(
+                        self.session, user_id, user_input
+                    )
+
             self.user_interaction.return_to_menu()
 
         # user = "test"

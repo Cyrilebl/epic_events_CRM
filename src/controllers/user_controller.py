@@ -27,6 +27,10 @@ class UserController:
             token = self.token.generate_token(user.id, user.role.name)
             return token
 
+    def logout(self):
+        self.success_message.confirm_logout()
+        return None
+
     def create_user(self, session):
         last_name = self.prompt.input("last name")
         first_name = self.prompt.input("first name")

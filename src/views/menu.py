@@ -18,11 +18,14 @@ class Menu:
     """
         )
 
-    def menu_header(self):
+    def header(self):
         title = "MENU"
         print("-" * 40)
         print(title.center(40))
         print("-" * 40)
+
+    def logout(self):
+        print("[0] Logout")
 
     def read_menu(self):
         print(
@@ -34,7 +37,7 @@ class Menu:
         )
 
     def manager(self):
-        self.menu_header()
+        self.header()
         self.read_menu()
         print(
             f"""
@@ -51,10 +54,11 @@ class Menu:
 [9] Assign support agent to event
     """
         )
+        self.logout()
         return self.prompt.user_choice(9)
 
     def commercial(self):
-        self.menu_header()
+        self.header()
         self.read_menu()
         print(
             f"""
@@ -69,14 +73,16 @@ class Menu:
 [7] Create event
         """
         )
+        self.logout()
         return self.prompt.user_choice(7)
 
     def support(self):
-        self.menu_header()
+        self.header()
         self.read_menu()
         print(
             f"""
 {click.style("Event Management", fg="cyan")}
 [4] Update event"""
         )
+        self.logout()
         return self.prompt.user_choice(4)

@@ -32,7 +32,10 @@ class Prompt:
                         click.style("Enter your choice", fg="magenta", bold=True)
                     )
                 )
-                if 0 < user_choice <= number_of_choices:
+
+                if user_choice == 0:
+                    return "logout"
+                elif 0 < user_choice <= number_of_choices:
                     return user_choice
                 else:
                     click.echo(click.style("Invalid choice.", fg="red", bold=True))

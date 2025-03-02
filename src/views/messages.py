@@ -67,6 +67,11 @@ class SuccessMessage:
             )
         )
 
+    def confirm_logout(self):
+        click.echo(
+            click.style("You have been logged out successfully.", fg="green", bold=True)
+        )
+
 
 class UserInteraction:
     def return_to_menu(self):
