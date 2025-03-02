@@ -26,22 +26,25 @@ class UserController:
             token = self.token.generate_token(user.id, user.role.name)
             return token
 
-    def create_user(self, session):
-        last_name = self.prompt.input("last name")
-        first_name = self.prompt.input("first name")
-
+    def get_valid_email(self):
         while True:
             email = self.prompt.input("email")
             if User.validate_email(email):
-                break
+                return email
             self.error_message.invalid_format("email")
 
+    def get_valid_password(self):
         while True:
             password = self.prompt.password(confirm=True)
             if User.validate_password(password):
-                break
+                return password
             self.error_message.invalid_password()
 
+    def create_user(self, session):
+        last_name = self.prompt.input("last name")
+        first_name = self.prompt.input("first name")
+        email = self.get_valid_email()
+        password = self.get_valid_password()
         role_name = self.prompt.role()
         role = session.query(Role).filter_by(name=role_name).first()
 
@@ -74,22 +77,12 @@ class UserController:
                         session, user, "first_name", self.prompt.input("new first name")
                     )
                 case 3:
-                    while True:
-                        email = self.prompt.input("email")
-                        if User.validate_email(email):
-                            self.data_manager.edit_field(session, user, "email", email)
-                            break
-                        self.error_message.invalid_format("email")
+                    email = self.get_valid_email()
+                    self.data_manager.edit_field(session, user, "email", email)
                 case 4:
-                    while True:
-                        password = self.prompt.password(confirm=True)
-                        if User.validate_password(password):
-                            user.set_password(password)
-                            self.data_manager.edit_field(
-                                session, user, "password", password
-                            )
-                            break
-                        self.error_message.invalid_password()
+                    password = self.get_valid_password()
+                    user.set_password(password)
+                    self.data_manager.edit_field(session, user, "password", password)
                 case 5:
                     self.data_manager.edit_field(
                         session, user, "role_name", self.prompt.role()
