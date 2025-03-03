@@ -9,31 +9,36 @@ class Menu:
 
     def login(self):
         title = "EPIC EVENTS CRM"
-        print("-" * 40)
-        print(title.center(40))
-        print("-" * 40)
-        print(
-            """
-          ------ Login ------
-    """
-        )
+        line = click.style("-" * 40)
+
+        click.echo(line)
+        click.echo(title.center(40))
+        click.echo(line)
+        click.echo("")
+        click.echo("------ Login ------".center(40))
+        click.echo("")
 
     def header(self):
         title = "MENU"
-        print("-" * 40)
-        print(title.center(40))
-        print("-" * 40)
+        line = click.style("-" * 40)
+
+        click.echo(line)
+        click.echo(title.center(40))
+        click.echo(line)
+
+    def section_title(self, icon, title):
+        return click.style(f"{icon} {title}", fg="cyan")
 
     def logout(self):
-        print("[0] Logout")
+        click.echo(click.style("🚪 [0] Logout", fg="red"))
 
     def read_menu(self):
         print(
             f"""
-{click.style("Read Data", fg="cyan")}
-[1] Read clients
-[2] Read contracts
-[3] Read events"""
+{self.section_title("📖", "Read Data")}
+[1] View clients
+[2] View contracts
+[3] View events"""
         )
 
     def manager(self):
@@ -41,16 +46,16 @@ class Menu:
         self.read_menu()
         print(
             f"""
-{click.style("User Management", fg="cyan")}
+{self.section_title("👤", "User Management")}
 [4] Create user
 [5] Update user
 [6] Delete user
 
-{click.style("Contract Management", fg="cyan")}
+{self.section_title("📜", "Contract Management")}
 [7] Create contract
 [8] Update contract
 
-{click.style("Event Management", fg="cyan")}
+{self.section_title("🎟️ ", "Event Management")}
 [9] Assign support agent to event
     """
         )
@@ -62,14 +67,14 @@ class Menu:
         self.read_menu()
         print(
             f"""
-{click.style("Client Management", fg="cyan")}
+{self.section_title("👤", "Client Management")}
 [4] Create client
 [5] Update client
 
-{click.style("Contract Management", fg="cyan")}
+{self.section_title("📜", "Contract Management")}
 [6] Update contract
-
-{click.style("Event Management", fg="cyan")}
+ 
+{self.section_title("🎟️ ", "Event Management")}
 [7] Create event
         """
         )
@@ -81,8 +86,9 @@ class Menu:
         self.read_menu()
         print(
             f"""
-{click.style("Event Management", fg="cyan")}
-[4] Update event"""
+{self.section_title("🎟️ ", "Event Management")}
+[4] Update event
+        """
         )
         self.logout()
         return self.prompt.user_choice(4)
