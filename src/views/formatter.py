@@ -67,7 +67,7 @@ class Formatter:
     def format_clients(self, clients_data):
         if not clients_data:
             click.echo(click.style("No current clients.", fg="yellow", bold=True))
-            return False
+            return
 
         headers = [
             "ID",
@@ -100,7 +100,6 @@ class Formatter:
         ]
 
         click.echo(tabulate(rows, headers, tablefmt="grid"))
-        return True
 
     def format_one_contract(self, contract):
         headers = [
@@ -122,7 +121,7 @@ class Formatter:
     def format_contracts(self, contracts_data):
         if not contracts_data:
             click.echo(click.style("No contracts available.", fg="yellow", bold=True))
-            return False
+            return
 
         headers = [
             "ID",
@@ -149,7 +148,6 @@ class Formatter:
         ]
 
         click.echo(tabulate(rows, headers, tablefmt="grid"))
-        return True
 
     def format_one_event(self, event):
         headers = [
@@ -183,7 +181,7 @@ class Formatter:
     def format_events(self, events_data):
         if not events_data:
             click.echo(click.style("No events scheduled.", fg="yellow", bold=True))
-            return False
+            return
 
         headers = [
             "Event ID",
@@ -198,6 +196,7 @@ class Formatter:
             "Assigned support",
         ]
 
+        sorted_events = sorted(events_data, key=lambda event: event.id)
         rows = [
             [
                 event.id,
@@ -215,8 +214,7 @@ class Formatter:
                     else None
                 ),
             ]
-            for event in events_data
+            for event in sorted_events
         ]
 
         click.echo(tabulate(rows, headers, tablefmt="grid"))
-        return True
