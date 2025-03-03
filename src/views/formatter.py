@@ -164,8 +164,8 @@ class Formatter:
 
         rows = [
             [
-                event.start_data,
-                event.end_data,
+                event.start_date,
+                event.end_date,
                 event.street_number,
                 event.street_name,
                 event.postal_code,
