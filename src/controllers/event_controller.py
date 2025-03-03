@@ -1,4 +1,4 @@
-from src.models import Client, Contract, Event, DataManager
+from src.models import User, Client, Contract, Event, DataManager
 from src.views import Prompt, Formatter, SuccessMessage
 from .validation_controller import ValidationController
 
@@ -27,9 +27,7 @@ class EventController:
         clients_assigned_to_commercial = (
             session.query(Client).filter_by(assigned_commercial=user_id).all()
         )
-        display_clients = self.formatter.format_clients(clients_assigned_to_commercial)
-        if not display_clients:
-            return
+        self.formatter.format_clients(clients_assigned_to_commercial)
 
         client = self.validation.get_valid_record(session, Client, "client", "add")
 
@@ -41,9 +39,7 @@ class EventController:
             )
             .all()
         )
-        display_contracts = self.formatter.format_contracts(contracts)
-        if not display_contracts:
-            return
+        self.formatter.format_contracts(contracts)
 
         contract = self.validation.get_valid_record(
             session, Contract, "contract", "add"
@@ -134,6 +130,16 @@ class EventController:
                     )
             break
 
+        self.success_message.confirm_action(
+            f"Event nº{event.id}",
+            "edited",
+        )
+
+    def assign_support(self, session, event, valid_support_ids):
+        support = self.validation.get_valid_record(
+            session, User, "support", "add", valid_support_ids
+        )
+        self.data_manager.edit_field(session, event, "assigned_support", support.id)
         self.success_message.confirm_action(
             f"Event nº{event.id}",
             "edited",
