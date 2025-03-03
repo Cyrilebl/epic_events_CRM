@@ -68,16 +68,34 @@ class MenuController:
                 self.formatter.format_one_contract(contract)
                 self.contract_controller.edit_contract(session, contract)
 
+            case 9:
+                events_without_support = (
+                    session.query(Event).filter(Event.assigned_support.is_(None)).all()
+                )
+                self.formatter.format_events(events_without_support)
+
+                valid_event_ids = {event.id for event in events_without_support}
+
+                event = self.validation.get_valid_record(
+                    session, Event, "event", "modify", valid_event_ids
+                )
+
+                supports = session.query(User).filter_by(role_name="support").all()
+                self.formatter.format_users(supports)
+
+                valid_support_ids = {support.id for support in supports}
+                self.event_controller.assign_support(session, event, valid_support_ids)
+
     def user_is_commercial(self, session, user_id, user_input):
         match user_input:
             case 4:
                 self.client_controller.create_client(session, user_id)
 
             case 5:
-                clients_assign_to_commercial = (
+                clients_assigned_to_commercial = (
                     session.query(Client).filter_by(assigned_commercial=user_id).all()
                 )
-                self.formatter.format_clients(clients_assign_to_commercial)
+                self.formatter.format_clients(clients_assigned_to_commercial)
                 client = self.validation.get_valid_record(
                     session, Client, "client", "modify"
                 )
@@ -104,13 +122,42 @@ class MenuController:
                 events_assigned_to_support = (
                     session.query(Event).filter_by(assigned_support=user_id).all()
                 )
-                display_events = self.formatter.format_events(
-                    events_assigned_to_support
-                )
-                if not display_events:
-                    return
+                self.formatter.format_events(events_assigned_to_support)
                 event = self.validation.get_valid_record(
                     session, Event, "event", "modify"
                 )
                 self.formatter.format_one_event(event)
                 self.event_controller.edit_event(session, event)
+
+    # def get_clients_assigned_to_commercial(self, session, user_id):
+    #     clients_assign_to_commercial = (
+    #         session.query(Client).filter_by(assigned_commercial=user_id).all()
+    #     )
+    #     self.formatter.format_clients(clients_assign_to_commercial)
+    #     return {client.id for client in clients_assign_to_commercial}
+
+    # def get_contracts_assigned_to_commercial(self, session, user_id):
+    #     contracts_assigned_to_commercial = (
+    #         session.query(Contract).filter_by(assigned_commercial=user_id).all()
+    #     )
+    #     self.formatter.format_contracts(contracts_assigned_to_commercial)
+    #     return {contract.id for contract in contracts_assigned_to_commercial}
+
+    # def get_events_assigned_to_support(self, session, user_id):
+    #     events_assigned_to_support = (
+    #         session.query(Event).filter_by(assigned_support=user_id).all()
+    #     )
+    #     self.formatter.format_events(events_assigned_to_support)
+    #     return {event.id for event in events_assigned_to_support}
+
+    # def get_events_without_support(self, session):
+    #     events_without_support = (
+    #         session.query(Event).filter(Event.assigned_support.is_(None)).all()
+    #     )
+    #     self.formatter.format_events(events_without_support)
+    #     return {event.id for event in events_without_support}
+
+    # def get_support_users(self, session):
+    #     supports = session.query(User).filter_by(role_name="support").all()
+    #     self.formatter.format_users(supports)
+    #     return {support.id for support in supports}
