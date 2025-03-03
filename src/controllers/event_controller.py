@@ -1,15 +1,16 @@
 from src.models import User, Client, Contract, Event, DataManager
-from src.views import Prompt, Formatter, SuccessMessage
+from src.views import Prompt, SuccessMessage
 from .validation_controller import ValidationController
+from .utility_controller import UtilityController
 
 
 class EventController:
     def __init__(self):
         self.data_manager = DataManager()
         self.prompt = Prompt()
-        self.formatter = Formatter()
         self.success_message = SuccessMessage()
         self.validation = ValidationController()
+        self.utility = UtilityController()
 
     def create_event(self, session, user_id):
         start_date = self.validation.get_valid_date(
@@ -24,25 +25,18 @@ class EventController:
         attendees = self.validation.get_valid_integer("number of attendees")
         notes = self.prompt.input("notes")
 
-        clients_assigned_to_commercial = (
-            session.query(Client).filter_by(assigned_commercial=user_id).all()
+        valid_client_ids = self.utility.get_records_by_filter(
+            session, Client, assigned_commercial=user_id
         )
-        self.formatter.format_clients(clients_assigned_to_commercial)
-
-        client = self.validation.get_valid_record(session, Client, "client", "add")
-
-        contracts = (
-            session.query(Contract)
-            .filter(
-                Contract.client_id == client.id,
-                Contract.signature == True,
-            )
-            .all()
+        client = self.utility.get_valid_record(
+            session, Client, "client", "add", valid_client_ids
         )
-        self.formatter.format_contracts(contracts)
 
-        contract = self.validation.get_valid_record(
-            session, Contract, "contract", "add"
+        valid_contracts_ids = self.utility.get_records_by_filter(
+            session, Contract, client_id=client.id, signature=True
+        )
+        contract = self.utility.get_valid_record(
+            session, Contract, "contract", "add", valid_contracts_ids
         )
 
         event = Event(
@@ -68,7 +62,7 @@ class EventController:
 
     def edit_event(self, session, event):
         while True:
-            user_choice = self.prompt.user_choice(3)
+            user_choice = self.prompt.user_choice(9)
 
             match user_choice:
                 case 1:
@@ -135,11 +129,23 @@ class EventController:
             "edited",
         )
 
-    def assign_support(self, session, event, valid_support_ids):
-        support = self.validation.get_valid_record(
+    def assign_support(self, session):
+        valid_event_ids = self.utility.get_records_by_filter(
+            session, Event, assigned_support=None
+        )
+        event = self.utility.get_valid_record(
+            session, Event, "event", "modify", valid_event_ids
+        )
+
+        valid_support_ids = self.utility.get_records_by_filter(
+            session, User, role_name="support"
+        )
+        support = self.utility.get_valid_record(
             session, User, "support", "add", valid_support_ids
         )
+
         self.data_manager.edit_field(session, event, "assigned_support", support.id)
+
         self.success_message.confirm_action(
             f"Event nº{event.id}",
             "edited",

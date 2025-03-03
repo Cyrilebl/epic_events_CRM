@@ -1,26 +1,26 @@
 from src.models import Client, Contract, DataManager
-from src.views import Prompt, Formatter, SuccessMessage
+from src.views import Prompt, SuccessMessage
 from .validation_controller import ValidationController
+from .utility_controller import UtilityController
 
 
 class ContractController:
     def __init__(self):
         self.data_manager = DataManager()
         self.prompt = Prompt()
-        self.formatter = Formatter()
         self.success_message = SuccessMessage()
         self.validation = ValidationController()
+        self.utility = UtilityController()
 
     def create_contract(self, session):
         total_price = self.validation.get_valid_price("total price")
         remaining_balance = self.validation.get_valid_price("remaining balance")
         signature = self.validation.get_valid_signature()
 
-        clients = session.query(Client).all()
-        display_clients = self.formatter.format_clients(clients)
-        if not display_clients:
-            return
-        client = self.validation.get_valid_record(session, Client, "client", "add")
+        valid_client_ids = self.utility.get_records_by_filter(session, Client)
+        client = self.utility.get_valid_record(
+            session, Client, "client", "add", valid_client_ids
+        )
 
         contract = Contract(
             total_price=total_price,
