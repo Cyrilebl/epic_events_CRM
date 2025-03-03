@@ -1,13 +1,11 @@
 from src.models import Validators
-from src.views import Prompt, Formatter, ErrorMessage, UserInteraction
+from src.views import Prompt, ErrorMessage
 
 
 class ValidationController:
     def __init__(self):
         self.prompt = Prompt()
-        self.formatter = Formatter()
         self.error_message = ErrorMessage()
-        self.user_interaction = UserInteraction()
 
     def get_valid_email(self):
         while True:
@@ -61,11 +59,3 @@ class ValidationController:
                 return int(user_input)
             except ValueError:
                 self.error_message.invalid_number()
-
-    def get_valid_record(self, session, model, entity_name, action):
-        while True:
-            record_id = self.user_interaction.prompt_user_selection(entity_name, action)
-            record = session.query(model).filter_by(id=record_id).first()
-            if record:
-                return record
-            self.error_message.invalid_id(entity_name)
