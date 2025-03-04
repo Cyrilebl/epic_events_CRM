@@ -39,28 +39,33 @@ class MenuController:
                 return self.formatter.format_events(events_data)
 
     def user_is_manager(self, session, user_input):
-        valid_user_ids = self.utility.get_records_by_filter(session, Client)
         match user_input:
             case 4:
-                self.user_controller.create_user(session)
+                users_data = session.query(User).all()
+                self.formatter.format_users(users_data)
 
             case 5:
+                self.user_controller.create_user(session)
+
+            case 6:
+                valid_user_ids = self.utility.get_records_by_filter(session, Client)
                 user = self.utility.get_valid_record(
                     session, User, "user", "modify", valid_user_ids
                 )
                 self.formatter.format_one_user(user)
                 self.user_controller.edit_user(session, user)
 
-            case 6:
+            case 7:
+                valid_user_ids = self.utility.get_records_by_filter(session, Client)
                 user = self.utility.get_valid_record(
                     session, User, "user", "delete", valid_user_ids
                 )
                 self.user_controller.delete_user(session)
 
-            case 7:
+            case 8:
                 self.contract_controller.create_contract(session)
 
-            case 8:
+            case 9:
                 valid_contract_ids = self.utility.get_records_by_filter(
                     session, Contract
                 )
@@ -70,7 +75,7 @@ class MenuController:
                 self.formatter.format_one_contract(contract)
                 self.contract_controller.edit_contract(session, contract)
 
-            case 9:
+            case 10:
                 self.event_controller.assign_support(session)
 
     def user_is_commercial(self, session, user_id, user_input):
@@ -96,7 +101,6 @@ class MenuController:
                 contract = self.utility.get_valid_record(
                     session, Contract, "contract", "modify", valid_contract_ids
                 )
-
                 self.formatter.format_one_contract(contract)
                 self.contract_controller.edit_contract(session, contract)
 
