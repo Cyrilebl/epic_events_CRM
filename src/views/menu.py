@@ -57,11 +57,12 @@ class Menu:
 [9] Update contract
 
 {self.section_title("🎟️ ", "Event Management")}
-[10] Assign support agent to event
+[10] View events without support
+[11] Assign support agent to event
     """
         )
         self.logout()
-        return self.prompt.user_choice(10)
+        return self.prompt.user_choice(11)
 
     def commercial(self):
         self.header()
@@ -73,14 +74,15 @@ class Menu:
 [5] Update client
 
 {self.section_title("📜", "Contract Management")}
-[6] Update contract
+[6] Unsigned contracts
+[7] Update contract
  
 {self.section_title("🎟️ ", "Event Management")}
-[7] Create event
+[8] Create event
         """
         )
         self.logout()
-        return self.prompt.user_choice(7)
+        return self.prompt.user_choice(8)
 
     def support(self):
         self.header()
@@ -88,8 +90,9 @@ class Menu:
         print(
             f"""
 {self.section_title("🎟️ ", "Event Management")}
-[4] Update event
+[4] My events
+[5] Update event
         """
         )
         self.logout()
-        return self.prompt.user_choice(4)
+        return self.prompt.user_choice(5)

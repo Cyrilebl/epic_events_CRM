@@ -76,6 +76,11 @@ class MenuController:
                 self.contract_controller.edit_contract(session, contract)
 
             case 10:
+                self.utility.get_records_by_filter(
+                    session, Event, assigned_support=None
+                )
+
+            case 11:
                 self.event_controller.assign_support(session)
 
     def user_is_commercial(self, session, user_id, user_input):
@@ -95,6 +100,11 @@ class MenuController:
                 self.client_controller.edit_client(session, client)
 
             case 6:
+                self.utility.get_records_by_filter(
+                    session, Contract, assigned_commercial=user_id, signature=False
+                )
+
+            case 7:
                 valid_contract_ids = self.utility.get_records_by_filter(
                     session, Contract, assigned_commercial=user_id
                 )
@@ -104,12 +114,17 @@ class MenuController:
                 self.formatter.format_one_contract(contract)
                 self.contract_controller.edit_contract(session, contract)
 
-            case 7:
+            case 8:
                 self.event_controller.create_event(session, user_id)
 
     def user_is_support(self, session, user_id, user_input):
         match user_input:
             case 4:
+                self.utility.get_records_by_filter(
+                    session, Event, assigned_support=user_id
+                )
+
+            case 5:
                 valid_event_ids = self.utility.get_records_by_filter(
                     session, Event, assigned_support=user_id
                 )
