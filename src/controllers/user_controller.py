@@ -1,3 +1,5 @@
+import sentry_sdk
+
 from src.models import Role, User, DataManager
 from src.views import Prompt, SuccessMessage
 from .validation_controller import ValidationController
@@ -32,6 +34,9 @@ class UserController:
             f"{user.last_name.title()} {user.first_name.title()} ({user.role_name})",
             "created",
         )
+        sentry_sdk.capture_message(
+            f"Collaborator {user.last_name.title()} {user.first_name.title()} ({user.role_name}) created"
+        )
 
     def edit_user(self, session, user):
         while True:
@@ -62,6 +67,9 @@ class UserController:
         self.success_message.confirm_action(
             f"{user.last_name.title()} {user.first_name.title()} ({user.role_name})",
             "edited",
+        )
+        sentry_sdk.capture_message(
+            f"Collaborator {user.last_name.title()} {user.first_name.title()} ({user.role_name}) edited"
         )
 
     def delete_user(self, session, user):

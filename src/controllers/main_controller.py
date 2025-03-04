@@ -5,6 +5,21 @@ from .auth_controller import AuthController
 from .menu_controller import MenuController
 from src.utils import ReturnToMainMenu
 
+import os
+import sentry_sdk
+from dotenv import load_dotenv
+
+load_dotenv()
+
+SENTRY_DSN = os.getenv("SENTRY_DSN")
+
+sentry_sdk.init(
+    dsn=SENTRY_DSN,
+    send_default_pii=True,
+    traces_sample_rate=1.0,
+    auto_session_tracking=True,
+)
+
 
 class MainController:
     def __init__(self):

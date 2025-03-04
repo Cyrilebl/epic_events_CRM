@@ -1,3 +1,5 @@
+import sentry_sdk
+
 from src.models import Client, Contract, DataManager
 from src.views import Prompt, SuccessMessage
 from .validation_controller import ValidationController
@@ -58,6 +60,9 @@ class ContractController:
                     signature = self.validation.get_valid_signature()
                     self.data_manager.edit_field(
                         session, contract, "signature", signature
+                    )
+                    sentry_sdk.capture_message(
+                        f"Contract nº{contract.id} edited. Signature : {contract.signature} "
                     )
             break
 
