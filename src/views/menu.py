@@ -27,15 +27,15 @@ class Menu:
         click.echo(line)
 
     def section_title(self, icon, title):
-        return click.style(f"{icon} {title}", fg="cyan")
+        return click.style(f"{icon} {title}", fg="green")
 
     def logout(self):
         click.echo(click.style("🚪 [0] Logout", fg="red"))
 
-    def read_menu(self):
+    def explore_records(self):
         print(
             f"""
-{self.section_title("📖", "Read Data")}
+{self.section_title("📖", "Records")}
 [1] View clients
 [2] View contracts
 [3] View events"""
@@ -43,28 +43,29 @@ class Menu:
 
     def manager(self):
         self.header()
-        self.read_menu()
+        self.explore_records()
         print(
             f"""
 {self.section_title("👤", "User Management")}
-[4] Create user
-[5] Update user
-[6] Delete user
+[4] View users
+[5] Create user
+[6] Update user
+[7] Delete user
 
 {self.section_title("📜", "Contract Management")}
-[7] Create contract
-[8] Update contract
+[8] Create contract
+[9] Update contract
 
 {self.section_title("🎟️ ", "Event Management")}
-[9] Assign support agent to event
+[10] Assign support agent to event
     """
         )
         self.logout()
-        return self.prompt.user_choice(9)
+        return self.prompt.user_choice(10)
 
     def commercial(self):
         self.header()
-        self.read_menu()
+        self.explore_records()
         print(
             f"""
 {self.section_title("👤", "Client Management")}
@@ -83,7 +84,7 @@ class Menu:
 
     def support(self):
         self.header()
-        self.read_menu()
+        self.explore_records()
         print(
             f"""
 {self.section_title("🎟️ ", "Event Management")}
