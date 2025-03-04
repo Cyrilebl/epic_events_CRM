@@ -1,31 +1,19 @@
-import os
 from src.models import User
-from src.views import Prompt, ErrorMessage, SuccessMessage
+from src.views import Menu, Prompt, ErrorMessage, SuccessMessage
 from .token import Token
-
-TOKEN_FILE = ".auth_token"
-
-
-def save_token(token):
-    with open(TOKEN_FILE, "w") as f:
-        f.write(token)
-
-
-def load_token():
-    if os.path.exists(TOKEN_FILE):
-        with open(TOKEN_FILE, "r") as f:
-            return f.read()
-    return None
 
 
 class AuthController:
     def __init__(self):
+        self.menu = Menu()
         self.prompt = Prompt()
         self.error_message = ErrorMessage()
         self.success_message = SuccessMessage()
         self.token = Token()
 
     def login(self, session):
+        self.menu.login()
+
         while True:
             email = self.prompt.input("email")
             password = self.prompt.password()

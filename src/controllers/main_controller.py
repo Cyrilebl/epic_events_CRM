@@ -1,5 +1,5 @@
 from src.models import init_db
-from src.views import Menu, UserInteraction
+from src.views import UserInteraction
 from .token import Token
 from .auth_controller import AuthController
 from .menu_controller import MenuController
@@ -24,21 +24,23 @@ sentry_sdk.init(
 class MainController:
     def __init__(self):
         self.session = init_db()
-        self.menu = Menu()
         self.user_interaction = UserInteraction()
         self.token = Token()
         self.auth = AuthController()
-        self.menu_controller = MenuController()
+        self.menu = MenuController()
 
     def run(self):
         # Login
-        self.menu.login()
         token = self.auth.login(self.session)
         user_id, role = self.token.verify_token(token)
 
-        # Menu
         while True:
-            user_input = self.menu_controller.show_menu(role)
+            user_input = self.menu.show_menu(role)
+
+            # Verify token before allowing any action
+            user_id, role = self.token.verify_token(token)
+            if user_id is None:
+                break
 
             # Logout
             if user_input == "logout":
@@ -46,19 +48,16 @@ class MainController:
                 break
 
             try:
-                self.menu_controller.show_data(self.session, user_input)
+                self.menu.show_data(self.session, user_input)
 
                 match role:
                     case "manager":
-                        self.menu_controller.user_is_manager(self.session, user_input)
+                        self.menu.user_is_manager(self.session, user_input)
                     case "commercial":
-                        self.menu_controller.user_is_commercial(
-                            self.session, user_id, user_input
-                        )
+                        self.menu.user_is_commercial(self.session, user_id, user_input)
                     case "support":
-                        self.menu_controller.user_is_support(
-                            self.session, user_id, user_input
-                        )
+                        self.menu.user_is_support(self.session, user_id, user_input)
+
             except ReturnToMainMenu:
                 pass
 
