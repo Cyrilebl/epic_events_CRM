@@ -1,4 +1,5 @@
 from src.views import Formatter, ErrorMessage, UserInteraction
+from src.utils import ReturnToMainMenu
 
 
 class UtilityController:
@@ -27,6 +28,9 @@ class UtilityController:
         return {record.id for record in records}
 
     def get_valid_record(self, session, model, entity_name, action, valid_ids):
+        if not valid_ids:
+            raise ReturnToMainMenu
+
         while True:
             record_id = self.user_interaction.prompt_user_selection(entity_name, action)
 
