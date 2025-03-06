@@ -16,11 +16,10 @@ DB_NAME = os.getenv("DB_NAME")
 
 DB_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
-engine = create_engine(DB_URL)
-
 
 def init_db():
+    engine = create_engine(DB_URL)
     Base.metadata.create_all(bind=engine)
 
     Session = sessionmaker(bind=engine)
-    return Session()
+    return Session(), engine
