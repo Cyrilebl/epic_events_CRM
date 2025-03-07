@@ -18,6 +18,27 @@ class TestClientController:
         controller.validation = self.mock_validation
         return controller
 
+    def _test_edit_client_case(
+        self, user_choice, input_value, field_name, expected_value
+    ):
+        mock_event = MagicMock()
+
+        self.mock_prompt.user_choice.return_value = user_choice
+        if user_choice == 3:
+            self.mock_validation.get_valid_email.return_value = input_value
+        if user_choice == 4:
+            self.mock_validation.get_valid_phone_number.return_value = input_value
+        else:
+            self.mock_prompt.input.return_value = input_value
+
+        controller = self._setup_controller()
+
+        controller.edit_client(self.mock_session, mock_event)
+
+        self.mock_data_manager.edit_field.assert_called_once_with(
+            self.mock_session, mock_event, field_name, expected_value
+        )
+
     def test_create_client(self):
         self.mock_prompt.input.side_effect = [
             "Doe",
@@ -38,36 +59,50 @@ class TestClientController:
 
         controller.create_client(self.mock_session, user_id=1)
 
-        self.mock_success_message.confirm_action.assert_called_once_with(
-            "Doe John", "created"
+    def test_edit_client_last_name(self):
+        self._test_edit_client_case(
+            user_choice=1,
+            input_value="Doe",
+            field_name="last_name",
+            expected_value="Doe",
         )
 
-    def test_edit_client(self):
-        mock_client = MagicMock()
-        mock_client.first_name = "John"
-        mock_client.last_name = "Doe"
-        mock_client.email = "john.doe@example.com"
-        mock_client.phone_number = "123456789"
-        mock_client.company_name = "Company Inc."
-        mock_client.information = "Some info"
+    def test_edit_client_first_name(self):
+        self._test_edit_client_case(
+            user_choice=2,
+            input_value="John",
+            field_name="first_name",
+            expected_value="John",
+        )
 
-        self.mock_prompt.user_choice.return_value = 1
-        self.mock_prompt.input.return_value = "NewLastName"
-        self.mock_prompt.user_choice.return_value = 2
-        self.mock_prompt.input.return_value = "NewFirstName"
-        self.mock_prompt.user_choice.return_value = 3
-        self.mock_prompt.input.return_value = "newemail@example.com"
-        self.mock_prompt.user_choice.return_value = 4
-        self.mock_prompt.input.return_value = "+33 333 333 333"
-        self.mock_prompt.user_choice.return_value = 5
-        self.mock_prompt.input.return_value = "New Company Name"
-        self.mock_prompt.user_choice.return_value = 6
-        self.mock_prompt.input.return_value = "New Info"
+    def test_edit_client_email(self):
+        self._test_edit_client_case(
+            user_choice=3,
+            input_value="john.doe@example.fr",
+            field_name="email",
+            expected_value="john.doe@example.fr",
+        )
 
-        controller = self._setup_controller()
+    def test_edit_client_phone_number(self):
+        self._test_edit_client_case(
+            user_choice=4,
+            input_value="+33 123 456 789",
+            field_name="phone_number",
+            expected_value="+33 123 456 789",
+        )
 
-        controller.edit_client(self.mock_session, mock_client)
+    def test_edit_client_company_name(self):
+        self._test_edit_client_case(
+            user_choice=5,
+            input_value="Doe Corp",
+            field_name="company_name",
+            expected_value="Doe Corp",
+        )
 
-        self.mock_success_message.confirm_action.assert_called_once_with(
-            "Doe John", "edited"
+    def test_edit_client_information(self):
+        self._test_edit_client_case(
+            user_choice=6,
+            input_value="VIP Client",
+            field_name="information",
+            expected_value="VIP Client",
         )

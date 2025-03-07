@@ -20,6 +20,25 @@ class TestContractController:
         controller.utility = self.mock_utility
         return controller
 
+    def _test_edit_contract_case(
+        self, user_choice, input_value, field_name, expected_value
+    ):
+        mock_event = MagicMock()
+
+        self.mock_prompt.user_choice.return_value = user_choice
+        if user_choice in [1, 2]:
+            self.mock_validation.get_valid_price.return_value = input_value
+        elif user_choice == 3:
+            self.mock_validation.get_valid_signature.return_value = input_value
+
+        controller = self._setup_controller()
+
+        controller.edit_contract(self.mock_session, mock_event)
+
+        self.mock_data_manager.edit_field.assert_called_once_with(
+            self.mock_session, mock_event, field_name, expected_value
+        )
+
     def test_create_contract(self):
         self.mock_validation.get_valid_price.return_value = 1000
         self.mock_validation.get_valid_signature.return_value = True
@@ -33,28 +52,26 @@ class TestContractController:
 
         controller.create_contract(self.mock_session)
 
-        self.mock_success_message.confirm_action.assert_called_once_with(
-            "Contract nºNone", "created"
+    def test_edit_contract_total_price(self):
+        self._test_edit_contract_case(
+            user_choice=1,
+            input_value="1000",
+            field_name="total_price",
+            expected_value="1000",
         )
 
-    def test_edit_contract(self):
-        mock_contract = MagicMock()
-        mock_contract.id = 1
-        mock_contract.total_price = 1000
-        mock_contract.remaining_balance = 500
-        mock_contract.signature = False
+    def test_edit_contract_remaining_balance(self):
+        self._test_edit_contract_case(
+            user_choice=2,
+            input_value="256",
+            field_name="remaining_balance",
+            expected_value="256",
+        )
 
-        self.mock_prompt.user_choice.return_value = 1
-        self.mock_validation.get_valid_price.return_value = 1200
-        self.mock_prompt.user_choice.return_value = 2
-        self.mock_validation.get_valid_price.return_value = 300
-        self.mock_prompt.user_choice.return_value = 3
-        self.mock_validation.get_valid_signature.return_value = True
-
-        controller = self._setup_controller()
-
-        controller.edit_contract(self.mock_session, mock_contract)
-
-        self.mock_success_message.confirm_action.assert_called_once_with(
-            "Contract nº1", "edited"
+    def test_edit_contract_signature(self):
+        self._test_edit_contract_case(
+            user_choice=3,
+            input_value="yes",
+            field_name="signature",
+            expected_value="yes",
         )

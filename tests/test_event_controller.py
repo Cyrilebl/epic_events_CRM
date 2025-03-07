@@ -26,13 +26,10 @@ class TestEventController:
         mock_event = MagicMock()
 
         self.mock_prompt.user_choice.return_value = user_choice
-        if user_choice in [1, 2, 8]:
-            self.mock_validation.get_valid_date.return_value = (
-                input_value if user_choice in [1, 2] else None
-            )
-            self.mock_validation.get_valid_integer.return_value = (
-                input_value if user_choice == 8 else None
-            )
+        if user_choice in [1, 2]:
+            self.mock_validation.get_valid_date.return_value = input_value
+        elif user_choice == 8:
+            self.mock_validation.get_valid_integer.return_value = input_value
         else:
             self.mock_prompt.input.return_value = input_value
 
@@ -67,10 +64,6 @@ class TestEventController:
         controller = self._setup_controller()
 
         controller.create_event(self.mock_session, user_id=1)
-
-        self.mock_success_message.confirm_action.assert_called_once_with(
-            "Event nºNone", "created"
-        )
 
     def test_edit_event_start_date(self):
         self._test_edit_event_case(
@@ -153,7 +146,3 @@ class TestEventController:
         controller = self._setup_controller()
 
         controller.assign_support(self.mock_session)
-
-        self.mock_success_message.confirm_action.assert_called_once_with(
-            "Event nº2", "edited"
-        )

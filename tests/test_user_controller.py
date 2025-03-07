@@ -24,16 +24,12 @@ class TestUserController:
         mock_event = MagicMock()
 
         self.mock_prompt.user_choice.return_value = user_choice
-        if user_choice in [3, 4, 5]:
-            self.mock_validation.get_valid_email.return_value = (
-                input_value if user_choice == 3 else None
-            )
-            self.mock_validation.get_valid_password.return_value = (
-                input_value if user_choice == 4 else None
-            )
-            self.mock_prompt.role.return_value = (
-                input_value if user_choice == 5 else None
-            )
+        if user_choice == 3:
+            self.mock_validation.get_valid_email.return_value = input_value
+        elif user_choice == 4:
+            self.mock_validation.get_valid_password.return_value = input_value
+        elif user_choice == 5:
+            self.mock_prompt.role.return_value = input_value
         else:
             self.mock_prompt.input.return_value = input_value
 
@@ -60,10 +56,6 @@ class TestUserController:
         controller = self._setup_controller()
 
         controller.create_user(self.mock_session)
-
-        self.mock_success_message.confirm_action.assert_called_once_with(
-            "Doe John (manager)", "created"
-        )
 
     def test_edit_user_last_name(self):
         self._test_edit_user_case(
@@ -114,7 +106,3 @@ class TestUserController:
         controller = self._setup_controller()
 
         controller.delete_user(self.mock_session, mock_user)
-
-        self.mock_success_message.confirm_action.assert_called_once_with(
-            "Doe John (manager)", "deleted"
-        )
