@@ -74,7 +74,7 @@ def test_return_to_menu(user_interaction):
 
 
 def test_prompt_user_selection(user_interaction):
-    with patch("click.prompt", return_value=42) as mock_prompt:
+    with patch("click.prompt", return_value=2) as mock_prompt:
         result = user_interaction.prompt_user_selection("user", "delete")
         mock_prompt.assert_called_once_with(
             click.style(
@@ -82,4 +82,4 @@ def test_prompt_user_selection(user_interaction):
             ),
             type=int,
         )
-        assert result == 42
+        assert result == 2
