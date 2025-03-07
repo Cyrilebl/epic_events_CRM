@@ -32,6 +32,8 @@ class MainController:
     def run(self):
         # Login
         token = self.auth.login(self.session)
+        if not token:
+            exit()
         user_id, role = self.token.verify_token(token)
 
         while True:

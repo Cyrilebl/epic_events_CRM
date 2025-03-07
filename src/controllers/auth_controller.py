@@ -22,11 +22,13 @@ class AuthController:
 
             if not user or not user.check_password(password):
                 self.error_message.invalid_credentials()
+                user_choice = self.prompt.try_again_yes_or_no()
+                if not user_choice:
+                    break
                 continue
 
-            token = self.token.generate_token(user.id, user.role.name)
-            return token
+            return self.token.generate_token(user.id, user.role.name)
 
     def logout(self):
         self.success_message.confirm_logout()
-        return None
+        return

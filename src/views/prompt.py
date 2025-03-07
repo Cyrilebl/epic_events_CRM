@@ -45,3 +45,23 @@ class Prompt:
                         "Invalid input. Please enter a number.", fg="red", bold=True
                     )
                 )
+
+    def try_again_yes_or_no(self):
+        while True:
+            user_choice = click.prompt(
+                click.style(
+                    "Do you want to try again ? (yes/no)", fg="magenta", bold=True
+                )
+            ).lower()
+
+            if user_choice == "yes":
+                return True
+            elif user_choice == "no":
+                click.echo(
+                    click.style("Thanks for visiting us !", fg="green", bold=True)
+                )
+                return False
+            else:
+                click.echo(
+                    click.style("Please enter 'yes' or 'no'.", fg="red", bold=True)
+                )
