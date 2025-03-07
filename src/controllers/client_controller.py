@@ -50,7 +50,7 @@ class ClientController:
                         session,
                         client,
                         "first_name",
-                        self.prompt.input("new last name"),
+                        self.prompt.input("new first name"),
                     )
                 case 3:
                     email = self.validation.get_valid_email()
