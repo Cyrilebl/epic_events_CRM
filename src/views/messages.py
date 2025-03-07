@@ -3,9 +3,7 @@ import click
 
 class ErrorMessage:
     def invalid_credentials(self):
-        click.echo(
-            click.style("Invalid credentials, please try again.", fg="red", bold=True)
-        )
+        click.echo(click.style("Invalid credentials.", fg="red", bold=True))
 
     def token_expired(self):
         click.echo(
