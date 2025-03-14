@@ -48,7 +48,7 @@ class MenuController:
                 self.user_controller.create_user(session)
 
             case 6:
-                valid_user_ids = self.utility.get_records_by_filter(session, Client)
+                valid_user_ids = self.utility.get_records_by_filter(session, User)
                 user = self.utility.get_valid_record(
                     session, User, "user", "modify", valid_user_ids
                 )
@@ -56,11 +56,11 @@ class MenuController:
                 self.user_controller.edit_user(session, user)
 
             case 7:
-                valid_user_ids = self.utility.get_records_by_filter(session, Client)
+                valid_user_ids = self.utility.get_records_by_filter(session, User)
                 user = self.utility.get_valid_record(
                     session, User, "user", "delete", valid_user_ids
                 )
-                self.user_controller.delete_user(session)
+                self.user_controller.delete_user(session, user)
 
             case 8:
                 self.contract_controller.create_contract(session)
