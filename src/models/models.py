@@ -42,9 +42,12 @@ class User(Base):
     role_name = Column(String(10), ForeignKey("roles.name"), nullable=False)
 
     role = relationship("Role", back_populates="users")
-    clients = relationship("Client", back_populates="commercial")
-    contracts = relationship("Contract", back_populates="commercial")
-    events = relationship("Event", back_populates="support")
+
+    clients = relationship("Client", back_populates="commercial", cascade="all, delete")
+    contracts = relationship(
+        "Contract", back_populates="commercial", cascade="all, delete"
+    )
+    events = relationship("Event", back_populates="support", cascade="all, delete")
 
     def set_password(self, password):
         """Hash password"""
@@ -74,11 +77,13 @@ class Client(Base):
     )
     last_update_date = Column(Date, onupdate=func.current_date())
 
-    assigned_commercial = Column(Integer, ForeignKey("users.id"), nullable=False)
+    assigned_commercial = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
 
     commercial = relationship("User", back_populates="clients")
-    contracts = relationship("Contract", back_populates="client")
-    events = relationship("Event", back_populates="client")
+    contracts = relationship("Contract", back_populates="client", cascade="all, delete")
+    events = relationship("Event", back_populates="client", cascade="all, delete")
 
 
 class Contract(Base):
@@ -94,7 +99,7 @@ class Contract(Base):
 
     client_id = Column(Integer, ForeignKey("clients.id"), index=True, nullable=False)
     assigned_commercial = Column(
-        Integer, ForeignKey("users.id"), index=True, nullable=False
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), index=True, nullable=False
     )
 
     client = relationship("Client", back_populates="contracts")
@@ -122,7 +127,9 @@ class Event(Base):
     contract_id = Column(
         Integer, ForeignKey("contracts.id"), index=True, nullable=False
     )
-    assigned_support = Column(Integer, ForeignKey("users.id"), index=True)
+    assigned_support = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
 
     client = relationship("Client", back_populates="events")
     contract = relationship("Contract", back_populates="event")

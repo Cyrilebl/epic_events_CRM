@@ -1,6 +1,6 @@
 import sentry_sdk
 
-from src.models import Role, User, Client, DataManager
+from src.models import Role, User, DataManager
 from src.views import Prompt, SuccessMessage
 from .validation_controller import ValidationController
 
@@ -73,7 +73,6 @@ class UserController:
         )
 
     def delete_user(self, session, user):
-        session.query(Client).filter_by(assigned_commercial=user.id).delete()
         self.data_manager.delete(session, user)
         self.success_message.confirm_action(
             f"{user.last_name.title()} {user.first_name.title()} ({user.role_name})",
