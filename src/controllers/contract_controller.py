@@ -29,7 +29,6 @@ class ContractController:
             remaining_balance=remaining_balance,
             signature=signature,
             client_id=client.id,
-            assigned_commercial=client.assigned_commercial,
         )
 
         self.data_manager.add(session, contract)

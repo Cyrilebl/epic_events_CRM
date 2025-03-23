@@ -49,7 +49,6 @@ class EventController:
             country=country,
             attendees=attendees,
             notes=notes,
-            client_id=client.id,
             contract_id=contract.id,
         )
 

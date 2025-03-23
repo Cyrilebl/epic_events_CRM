@@ -44,9 +44,6 @@ class User(Base):
     role = relationship("Role", back_populates="users")
 
     clients = relationship("Client", back_populates="commercial", cascade="all, delete")
-    contracts = relationship(
-        "Contract", back_populates="commercial", cascade="all, delete"
-    )
     events = relationship("Event", back_populates="support", cascade="all, delete")
 
     def set_password(self, password):
@@ -83,7 +80,6 @@ class Client(Base):
 
     commercial = relationship("User", back_populates="clients")
     contracts = relationship("Contract", back_populates="client", cascade="all, delete")
-    events = relationship("Event", back_populates="client", cascade="all, delete")
 
 
 class Contract(Base):
@@ -98,12 +94,8 @@ class Contract(Base):
     signature = Column(Boolean, index=True, default=False)
 
     client_id = Column(Integer, ForeignKey("clients.id"), index=True, nullable=False)
-    assigned_commercial = Column(
-        Integer, ForeignKey("users.id", ondelete="CASCADE"), index=True, nullable=False
-    )
 
     client = relationship("Client", back_populates="contracts")
-    commercial = relationship("User", back_populates="contracts")
     event = relationship("Event", back_populates="contract")
 
 
@@ -123,7 +115,6 @@ class Event(Base):
     attendees = Column(Integer, nullable=False)
     notes = Column(Text)
 
-    client_id = Column(Integer, ForeignKey("clients.id"), index=True, nullable=False)
     contract_id = Column(
         Integer, ForeignKey("contracts.id"), index=True, nullable=False
     )
@@ -131,6 +122,5 @@ class Event(Base):
         Integer, ForeignKey("users.id", ondelete="CASCADE"), index=True
     )
 
-    client = relationship("Client", back_populates="events")
     contract = relationship("Contract", back_populates="event")
     support = relationship("User", back_populates="events")

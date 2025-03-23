@@ -142,7 +142,7 @@ class Formatter:
                 contract.remaining_balance,
                 contract.creation_date,
                 contract.signature,
-                f"{contract.commercial.last_name} {contract.commercial.first_name}",
+                f"{contract.client.commercial.last_name} {contract.client.commercial.first_name}",
             ]
             for contract in sorted_contracts
         ]
@@ -201,8 +201,8 @@ class Formatter:
             [
                 event.id,
                 event.contract_id,
-                f"{event.client.last_name} {event.client.first_name}",
-                f"{event.client.email}/{event.client.phone_number}",
+                f"{event.contract.client.last_name} {event.contract.client.first_name}",
+                f"{event.contract.client.email}/{event.contract.client.phone_number}",
                 event.start_date,
                 event.end_date,
                 f"{event.street_number} {event.street_name}, {event.postal_code} {event.city}, {event.country}",
